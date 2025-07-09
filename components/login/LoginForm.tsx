@@ -1,7 +1,21 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  Platform,
+} from "react-native";
 import React from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { router } from "expo-router";
+
+const color = Platform.select({
+  default: "black",
+  web: "black",
+  android: "white",
+});
 
 const LoginForm = () => {
   const formik = useFormik({
@@ -10,7 +24,10 @@ const LoginForm = () => {
       email: Yup.string().required("Required"),
       password: Yup.string().required("Required"),
     }),
-    onSubmit: (values) => console.log(values),
+    onSubmit: (values) => {
+      console.log(values);
+      router.push("/home");
+    },
   });
 
   return (
@@ -21,11 +38,9 @@ const LoginForm = () => {
           placeholderTextColor={"#444"}
           style={styles.input}
           textContentType="emailAddress"
-          autoFocus={true}
           autoCapitalize="none"
           value={formik.values.email}
           onChangeText={formik.handleChange("email")}
-          onBlur={formik.handleBlur("email")}
         />
         {formik.touched.email && formik.errors.email ? (
           <Text style={styles.errorStyle}>{formik.errors.email}</Text>
@@ -42,7 +57,6 @@ const LoginForm = () => {
           secureTextEntry={true}
           value={formik.values.password}
           onChangeText={formik.handleChange("password")}
-          onBlur={formik.handleBlur("password")}
         />
 
         {formik.touched.password && formik.errors.password ? (
@@ -72,6 +86,7 @@ const styles = StyleSheet.create({
   },
   inputField: {
     width: "100%",
+    color: color,
   },
   input: {
     outline: "none",
@@ -81,7 +96,7 @@ const styles = StyleSheet.create({
     padding: 5,
     borderRadius: 3,
     marginTop: 12,
-    color: "white",
+    color: color,
   },
   login: {
     color: "white",
@@ -102,5 +117,12 @@ const styles = StyleSheet.create({
     color: "red",
     textAlign: "left",
     marginTop: 4,
+    fontSize: 1,
+  },
+  lightColor: {
+    color: "black",
+  },
+  darkColor: {
+    color: "white",
   },
 });

@@ -2,7 +2,7 @@ import { StyleSheet, View } from "react-native";
 import React from "react";
 import Login from "@/containers/Login";
 
-const index = () => {
+const Index = () => {
   return (
     <View>
       <Login />
@@ -10,6 +10,6 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;
 
 const styles = StyleSheet.create({});
