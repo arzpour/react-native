@@ -1,12 +1,23 @@
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView, ScrollView, StyleSheet } from "react-native";
 import React from "react";
 import Header from "@/components/home/header";
+import Stories from "@/components/home/stories";
+import { Posts } from "@/components/home/posts";
+import posts from "@/data/posts";
 
 const Home = () => {
   return (
-    <SafeAreaView style={styles.container}>
-      <Header />
-    </SafeAreaView>
+    <ScrollView>
+      <SafeAreaView style={styles.container}>
+        <Header />
+        <Stories />
+        <ScrollView>
+          {posts.map((post, index) => (
+            <Posts key={index} posts={post} />
+          ))}
+        </ScrollView>
+      </SafeAreaView>
+    </ScrollView>
   );
 };
 
@@ -15,5 +26,8 @@ export default Home;
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "black",
+    // marginTop: 20,
+    // paddingTop: 20,
+    // width: "100%"
   },
 });

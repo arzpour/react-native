@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     color: "red",
     textAlign: "left",
     marginTop: 4,
-    fontSize: 1,
+    fontSize: 10,
   },
   lightColor: {
     color: "black",

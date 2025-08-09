@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 import React from "react";
 import Login from "@/containers/Login";
 
@@ -11,5 +11,3 @@ const Index = () => {
 };
 
 export default Index;
-
-const styles = StyleSheet.create({});
