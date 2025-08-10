@@ -1,21 +1,9 @@
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-  Platform,
-} from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import React from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { router } from "expo-router";
-
-const color = Platform.select({
-  default: "black",
-  web: "black",
-  android: "white",
-});
+import { color } from "@/utils/color";
 
 const LoginForm = () => {
   const formik = useFormik({
@@ -26,7 +14,7 @@ const LoginForm = () => {
     }),
     onSubmit: (values) => {
       console.log(values);
-      router.push("/home");
+      router.replace("/home");
     },
   });
 
