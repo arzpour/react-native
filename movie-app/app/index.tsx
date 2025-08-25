@@ -3,6 +3,7 @@ import React from "react";
 import {
   SafeAreaView,
   ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -16,14 +17,15 @@ export default function Page() {
   const [upcomingMovies, setUpcomingMovies] = React.useState([1, 2, 3, 4]);
 
   return (
-    <SafeAreaView className="flex flex-1 bg-neutral-800">
+    <SafeAreaView style={styles.container}>
       {/* search and logo */}
-      <SafeAreaView className="m-5">
+      <SafeAreaView style={{ margin: 20, marginTop: 35 }}>
         <StatusBar style="light" />
-        <View className="flex flex-row justify-between items-center">
+        <View style={styles.head}>
           <Octicons name="three-bars" size={24} color="white" />
-          <Text className="text-white text-2xl font-bold">
-            <Text className="text-yellow-400">M</Text>ovies
+          <Text style={styles.title}>
+            <Text style={{ color: "yellow" }}>M</Text>
+            ovies
           </Text>
           <TouchableOpacity>
             <EvilIcons name="search" size={29} color="white" />
@@ -44,3 +46,22 @@ export default function Page() {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    display: "flex",
+    flex: 1,
+    backgroundColor: "#262626",
+  },
+  head: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  title: {
+    color: "white",
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+});
