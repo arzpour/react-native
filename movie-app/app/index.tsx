@@ -9,9 +9,12 @@ import {
 } from "react-native";
 import { Octicons, EvilIcons } from "@expo/vector-icons";
 import TrendingMovies from "@/components/trendingMovies";
+import MovieList from "@/components/movieList";
 
 export default function Page() {
   const [trendingMovies, setTrendingMovies] = React.useState([1, 2, 3, 4]);
+  const [upcomingMovies, setUpcomingMovies] = React.useState([1, 2, 3, 4]);
+
   return (
     <SafeAreaView className="flex flex-1 bg-neutral-800">
       {/* search and logo */}
@@ -28,9 +31,15 @@ export default function Page() {
         </View>
       </SafeAreaView>
 
-      <ScrollView>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 10 }}
+      >
         {/* trending movies carousel */}
         <TrendingMovies data={trendingMovies} />
+
+        {/* upcoming movies row */}
+        <MovieList title="Upcoming" data={upcomingMovies} />
       </ScrollView>
     </SafeAreaView>
   );

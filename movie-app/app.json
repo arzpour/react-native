@@ -1,20 +1,42 @@
 {
   "expo": {
-    "scheme": "acme",
+    "name": "movie-app",
+    "slug": "movie-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "movieapp",
     "userInterfaceStyle": "automatic",
-    "orientation": "default",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true
+    },
     "web": {
-      "output": "static"
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      "expo-router",
       [
-        "expo-router",
+        "expo-splash-screen",
         {
-          "origin": "https://n"
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
         }
       ]
     ],
-    "name": "movie-app",
-    "slug": "movie-app"
+    "experiments": {
+      "typedRoutes": true
+    }
   }
 }

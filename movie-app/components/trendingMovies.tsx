@@ -12,8 +12,9 @@ const TrendingMovies = ({ data }) => {
   const handleClick = () => {
     // navigation.navigate("Movie", item);
   };
+
   return (
-    <View className="my-6 mb-8 mx-5">
+    <View className="my-5 mx-5">
       <Text className="text-white font-semibold text-xl mb-4">Trending</Text>
       {data && data.length > 0 && (
         <Carousel
