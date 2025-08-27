@@ -3,7 +3,7 @@ import React from "react";
 
 const MovieCard = ({ item, width, height, handleClick }) => {
   return (
-    <TouchableWithoutFeedback onPress={handleClick}>
+    <TouchableWithoutFeedback onPress={() => handleClick(item)}>
       <Image
         source={require("../assets/images/adaptive-icon.png")}
         style={{

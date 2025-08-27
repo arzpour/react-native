@@ -13,8 +13,15 @@ import TrendingMovies from "@/components/trendingMovies";
 import MovieList from "@/components/movieList";
 
 export default function Page() {
-  const [trendingMovies, setTrendingMovies] = React.useState([1, 2, 3, 4]);
-  const [upcomingMovies, setUpcomingMovies] = React.useState([1, 2, 3, 4]);
+  const [trendingMovies, setTrendingMovies] = React.useState([
+    1, 2, 3, 4, 5, 6,
+  ]);
+  const [upcomingMovies, setUpcomingMovies] = React.useState([
+    1, 2, 3, 4, 5, 6,
+  ]);
+  const [topRatedMovies, setTopRatedMovies] = React.useState([
+    1, 2, 3, 4, 5, 6,
+  ]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -42,6 +49,9 @@ export default function Page() {
 
         {/* upcoming movies row */}
         <MovieList title="Upcoming" data={upcomingMovies} />
+
+        {/* top rated movies row */}
+        <MovieList title="Top Rated" data={topRatedMovies} />
       </ScrollView>
     </SafeAreaView>
   );
