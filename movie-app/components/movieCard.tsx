@@ -5,7 +5,7 @@ const MovieCard = ({ item, width, height, handleClick }) => {
   return (
     <TouchableWithoutFeedback onPress={() => handleClick(item)}>
       <Image
-        source={require("../assets/images/adaptive-icon.png")}
+        source={require("../assets/images/00.jpg")}
         style={{
           width: width * 0.9,
           height: height * 0.9,

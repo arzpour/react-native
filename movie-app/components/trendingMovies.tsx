@@ -28,13 +28,13 @@ const TrendingMovies = ({ data }) => {
             <MovieCard
               item={item}
               width={width * 0.8}
-              height={400}
+              height={470}
               handleClick={handleClick}
             />
           )}
           mode="parallax"
           width={pictureWidth}
-          height={350}
+          height={410}
           style={{
             display: "flex",
             flexDirection: "row",
@@ -65,6 +65,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 15,
     fontWeight: "semibold",
-    marginBottom: 8,
+    marginBottom: 3,
   },
 });
