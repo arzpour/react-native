@@ -30,7 +30,7 @@ const MovieById = () => {
 
   return (
     <ScrollView
-      contentContainerStyle={{ paddingBottom: 30 }}
+      contentContainerStyle={{ paddingBottom: 10 }}
       style={styles.container}
     >
       {/* back button and movie poster */}
@@ -159,8 +159,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   backIcon: {
-    paddingVertical: 5,
-    paddingHorizontal: 8,
+    padding: 5,
     display: "flex",
     justifyContent: "center",
   },

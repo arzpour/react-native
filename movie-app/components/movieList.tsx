@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  ViewStyle,
 } from "react-native";
 import React from "react";
 import { themeStyles } from "@/theme/index";
@@ -18,13 +19,19 @@ interface IMovieList {
   title: string;
   data: number[];
   hideSeeAll?: boolean;
+  className?: ViewStyle;
 }
 
-const MovieList: React.FC<IMovieList> = ({ title, data, hideSeeAll }) => {
+const MovieList: React.FC<IMovieList> = ({
+  title,
+  data,
+  hideSeeAll,
+  className,
+}) => {
   const router = useRouter();
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, className]}>
       <View style={styles.head}>
         <Text style={styles.title}>{title}</Text>
         {!hideSeeAll && (
@@ -68,7 +75,7 @@ const MovieList: React.FC<IMovieList> = ({ title, data, hideSeeAll }) => {
                   style={{
                     color: "white",
                     marginVertical: 7,
-                    marginBottom: 30,
+                    marginBottom: 20,
                   }}
                 >
                   {movieName.length > 10

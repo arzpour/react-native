@@ -1,6 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import {
+  Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -26,7 +27,15 @@ export default function Page() {
   return (
     <SafeAreaView style={styles.container}>
       {/* search and logo */}
-      <SafeAreaView style={{ margin: 20, marginTop: 35 }}>
+      <SafeAreaView
+        style={{
+          margin: 20,
+          ...Platform.select({
+            android: { marginTop: 45, marginBottom: 16 },
+            web: { marginTop: 25 },
+          }),
+        }}
+      >
         <StatusBar style="light" />
         <View style={styles.head}>
           <Octicons name="three-bars" size={24} color="white" />
