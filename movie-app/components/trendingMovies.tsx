@@ -2,9 +2,9 @@ import { Dimensions, Platform, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import Carousel from "react-native-reanimated-carousel";
 import MovieCard from "./movieCard";
-import { useNavigation, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
 const TrendingMovies = ({ data }) => {
   const router = useRouter();

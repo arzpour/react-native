@@ -12,6 +12,8 @@ import {
 import { Octicons, EvilIcons } from "@expo/vector-icons";
 import TrendingMovies from "@/components/trendingMovies";
 import MovieList from "@/components/movieList";
+import { useRouter } from "expo-router";
+import Loading from "@/components/loading";
 
 export default function Page() {
   const [trendingMovies, setTrendingMovies] = React.useState([
@@ -23,6 +25,10 @@ export default function Page() {
   const [topRatedMovies, setTopRatedMovies] = React.useState([
     1, 2, 3, 4, 5, 6,
   ]);
+
+  const [loading, setLoading] = React.useState(false);
+
+  const router = useRouter();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -43,25 +49,29 @@ export default function Page() {
             <Text style={{ color: "yellow" }}>M</Text>
             ovies
           </Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => router.navigate("/search")}>
             <EvilIcons name="search" size={29} color="white" />
           </TouchableOpacity>
         </View>
       </SafeAreaView>
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 10 }}
-      >
-        {/* trending movies carousel */}
-        <TrendingMovies data={trendingMovies} />
+      {loading ? (
+        <Loading />
+      ) : (
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 10 }}
+        >
+          {/* trending movies carousel */}
+          <TrendingMovies data={trendingMovies} />
 
-        {/* upcoming movies row */}
-        <MovieList title="Upcoming" data={upcomingMovies} />
+          {/* upcoming movies row */}
+          <MovieList title="Upcoming" data={upcomingMovies} />
 
-        {/* top rated movies row */}
-        <MovieList title="Top Rated" data={topRatedMovies} />
-      </ScrollView>
+          {/* top rated movies row */}
+          <MovieList title="Top Rated" data={topRatedMovies} />
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 }
