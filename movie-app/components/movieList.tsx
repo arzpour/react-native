@@ -12,12 +12,13 @@ import {
 import React from "react";
 import { themeStyles } from "@/theme/index";
 import { useRouter } from "expo-router";
+import { image185 } from "@/api/moviedb";
 
 const { width, height } = Dimensions.get("window");
 
 interface IMovieList {
   title: string;
-  data: number[];
+  data: IMoviesRes;
   hideSeeAll?: boolean;
   className?: ViewStyle;
 }
@@ -47,45 +48,46 @@ const MovieList: React.FC<IMovieList> = ({
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 5, marginTop: 16 }}
       >
-        {data.map((item, index) => {
-          const movieName = "movie namemooooooooooooooooo";
-          return (
-            <TouchableWithoutFeedback
-              key={index}
-              onPress={() => router.navigate(`/movie/${item}`)}
-            >
-              <View
-                style={{
-                  margin: 10,
-                  marginLeft: 0,
-                  paddingRight: 5,
-                  justifyContent: "center",
-                }}
+        {data &&
+          data.results.length > 0 &&
+          data.results.map((item, index) => {
+            return (
+              <TouchableWithoutFeedback
+                key={index}
+                onPress={() => router.navigate(`/movie/${item}`)}
               >
-                <Image
-                  source={require("../assets/images/load.jpg")}
+                <View
                   style={{
-                    width: width * 0.29,
-                    height: height * 0.22,
-                    marginBottom: 10,
-                    borderRadius: 10,
-                  }}
-                />
-                <Text
-                  style={{
-                    color: "white",
-                    marginVertical: 7,
-                    marginBottom: 20,
+                    margin: 10,
+                    marginLeft: 0,
+                    paddingRight: 5,
+                    justifyContent: "center",
                   }}
                 >
-                  {movieName.length > 10
-                    ? movieName.slice(0, 10) + "..."
-                    : movieName}{" "}
-                </Text>
-              </View>
-            </TouchableWithoutFeedback>
-          );
-        })}
+                  <Image
+                    source={{ uri: image185(item.poster_path) }}
+                    style={{
+                      width: width * 0.29,
+                      height: height * 0.22,
+                      marginBottom: 10,
+                      borderRadius: 10,
+                    }}
+                  />
+                  <Text
+                    style={{
+                      color: "white",
+                      marginVertical: 7,
+                      marginBottom: 20,
+                    }}
+                  >
+                    {item.title.length > 10
+                      ? item.title.slice(0, 10) + "..."
+                      : item.title}{" "}
+                  </Text>
+                </View>
+              </TouchableWithoutFeedback>
+            );
+          })}
       </ScrollView>
     </View>
   );

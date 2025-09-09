@@ -14,21 +14,47 @@ import TrendingMovies from "@/components/trendingMovies";
 import MovieList from "@/components/movieList";
 import { useRouter } from "expo-router";
 import Loading from "@/components/loading";
+import {
+  fetchTopRatedMovies,
+  fetchTrendingMovies,
+  fetchUpcomingMovies,
+} from "@/api/moviedb";
 
 export default function Page() {
-  const [trendingMovies, setTrendingMovies] = React.useState([
-    1, 2, 3, 4, 5, 6,
-  ]);
-  const [upcomingMovies, setUpcomingMovies] = React.useState([
-    1, 2, 3, 4, 5, 6,
-  ]);
-  const [topRatedMovies, setTopRatedMovies] = React.useState([
-    1, 2, 3, 4, 5, 6,
-  ]);
+  const [trendingMovies, setTrendingMovies] = React.useState<IMoviesRes>();
+  const [upcomingMovies, setUpcomingMovies] = React.useState<IMoviesRes>();
+  const [topRatedMovies, setTopRatedMovies] = React.useState<IMoviesRes>();
 
   const [loading, setLoading] = React.useState(false);
 
   const router = useRouter();
+
+  React.useEffect(() => {
+    getTrendingMovies();
+    getUpcomingMovies();
+    getTopRatedMovies();
+  }, []);
+
+  const getTrendingMovies = async () => {
+    const data: IMoviesRes = await fetchTrendingMovies();
+    if (data && data.results.length > 0) {
+      setTrendingMovies(data);
+    }
+  };
+
+  const getUpcomingMovies = async () => {
+    const data: IMoviesRes = await fetchUpcomingMovies();
+    if (data && data.results.length > 0) {
+      setUpcomingMovies(data);
+    }
+  };
+
+  const getTopRatedMovies = async () => {
+    const data: IMoviesRes = await fetchTopRatedMovies();
+    if (data && data.results.length > 0) {
+      setTopRatedMovies(data);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>

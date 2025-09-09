@@ -6,10 +6,14 @@ import { useRouter } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
-const TrendingMovies = ({ data }) => {
+interface ITrendingMovies {
+  data: IMoviesRes;
+}
+
+const TrendingMovies = ({ data }: ITrendingMovies) => {
   const router = useRouter();
 
-  const handleClick = (item: string) => {
+  const handleClick = (item: number) => {
     router.navigate(`/movie/${item}`);
   };
 
@@ -21,9 +25,9 @@ const TrendingMovies = ({ data }) => {
   return (
     <View style={{ margin: 20 }}>
       <Text style={styles.title}>Trending</Text>
-      {data && data.length > 0 && (
+      {data && (
         <Carousel
-          data={data}
+          data={data.results}
           renderItem={({ item }) => (
             <MovieCard
               item={item}
@@ -51,20 +55,9 @@ const TrendingMovies = ({ data }) => {
 export default TrendingMovies;
 
 const styles = StyleSheet.create({
-  container: {
-    marginHorizontal: 20,
-    marginBottom: 10,
-  },
-  head: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
   title: {
     color: "white",
     fontSize: 15,
     fontWeight: "semibold",
-    marginBottom: 3,
   },
 });
