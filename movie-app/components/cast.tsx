@@ -29,7 +29,8 @@ const Cast: React.FC<ICast> = ({ cast }) => {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingVertical: 15 }}
       >
-        {cast.length > 0 &&
+        {cast &&
+          cast.length > 0 &&
           cast.map((el) => (
             <TouchableOpacity
               key={el}
@@ -56,12 +57,12 @@ const Cast: React.FC<ICast> = ({ cast }) => {
                 />
               </View>
               <Text style={{ color: "white", fontSize: 12 }}>
-                {characterName.length > 10
+                {characterName && characterName.length > 10
                   ? characterName.slice(0, 10) + "..."
                   : characterName}
               </Text>
               <Text style={{ color: "#bdbdbdee", fontSize: 12, marginTop: 1 }}>
-                {personName.length > 10
+                {personName && personName.length > 10
                   ? personName.slice(0, 10) + "..."
                   : personName}
               </Text>

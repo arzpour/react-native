@@ -37,21 +37,21 @@ export default function Page() {
 
   const getTrendingMovies = async () => {
     const data: IMoviesRes = await fetchTrendingMovies();
-    if (data && data.results.length > 0) {
+    if (data && data?.results?.length > 0) {
       setTrendingMovies(data);
     }
   };
 
   const getUpcomingMovies = async () => {
     const data: IMoviesRes = await fetchUpcomingMovies();
-    if (data && data.results.length > 0) {
+    if (data && data?.results?.length > 0) {
       setUpcomingMovies(data);
     }
   };
 
   const getTopRatedMovies = async () => {
     const data: IMoviesRes = await fetchTopRatedMovies();
-    if (data && data.results.length > 0) {
+    if (data && data?.results?.length > 0) {
       setTopRatedMovies(data);
     }
   };
@@ -88,14 +88,26 @@ export default function Page() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 10 }}
         >
-          {/* trending movies carousel */}
-          <TrendingMovies data={trendingMovies} />
+          {trendingMovies && trendingMovies?.results?.length > 0 && (
+            <>
+              {/* trending movies carousel */}
+              <TrendingMovies data={trendingMovies} />
+            </>
+          )}
 
-          {/* upcoming movies row */}
-          <MovieList title="Upcoming" data={upcomingMovies} />
+          {upcomingMovies && upcomingMovies?.results?.length > 0 && (
+            <>
+              {/* upcoming movies row */}
+              <MovieList title="Upcoming" data={upcomingMovies} />
+            </>
+          )}
 
-          {/* top rated movies row */}
-          <MovieList title="Top Rated" data={topRatedMovies} />
+          {topRatedMovies && topRatedMovies?.results?.length > 0 && (
+            <>
+              {/* top rated movies row */}
+              <MovieList title="Top Rated" data={topRatedMovies} />
+            </>
+          )}
         </ScrollView>
       )}
     </SafeAreaView>

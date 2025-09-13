@@ -45,7 +45,9 @@ const Search = () => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ padding: 15 }}
         >
-          <Text style={{ color: "white" }}>Results ({results.length})</Text>
+          <Text style={{ color: "white" }}>
+            Results ({results ?? results?.length})
+          </Text>
           <View
             style={{
               display: "flex",
@@ -56,7 +58,7 @@ const Search = () => {
               marginVertical: 20,
             }}
           >
-            {results.length > 0 ? (
+            {results && results?.length > 0 ? (
               results.map((item, index) => (
                 <TouchableWithoutFeedback
                   key={index}
@@ -72,7 +74,7 @@ const Search = () => {
                       }}
                     />
                     <Text style={{ color: "white", marginVertical: 10 }}>
-                      {movieName.length > 10
+                      {movieName && movieName.length > 10
                         ? movieName.slice(0, 10) + "..."
                         : movieName}
                     </Text>

@@ -13,10 +13,6 @@ interface ITrendingMovies {
 const TrendingMovies = ({ data }: ITrendingMovies) => {
   const router = useRouter();
 
-  const handleClick = (item: number) => {
-    router.navigate(`/movie/${item}`);
-  };
-
   const pictureWidth = Platform.select({
     web: width * 0.8,
     android: width * 0.85,
@@ -25,16 +21,11 @@ const TrendingMovies = ({ data }: ITrendingMovies) => {
   return (
     <View style={{ margin: 20 }}>
       <Text style={styles.title}>Trending</Text>
-      {data && (
+      {data?.results?.length > 0 && (
         <Carousel
           data={data.results}
           renderItem={({ item }) => (
-            <MovieCard
-              item={item}
-              width={width * 0.8}
-              height={470}
-              handleClick={handleClick}
-            />
+            <MovieCard item={item} width={width * 0.8} height={470} />
           )}
           mode="parallax"
           width={pictureWidth}

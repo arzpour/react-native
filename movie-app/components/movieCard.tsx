@@ -1,17 +1,23 @@
 import { Image, TouchableWithoutFeedback } from "react-native";
 import React from "react";
 import { image500 } from "@/api/moviedb";
+import { useRouter } from "expo-router";
 
 interface IMovieCard {
   item: IMoviesResult;
   width: number;
   height: number;
-  handleClick: (value: number) => void;
 }
 
-const MovieCard = ({ item, width, height, handleClick }: IMovieCard) => {
+const MovieCard = ({ item, width, height }: IMovieCard) => {
+  const router = useRouter();
+
+  const handleClick = () => {
+    router.navigate(`/movie/${item.id}`);
+  };
+
   return (
-    <TouchableWithoutFeedback onPress={() => handleClick(item.id)}>
+    <TouchableWithoutFeedback onPress={handleClick}>
       <Image
         source={{ uri: image500(item.poster_path) }}
         style={{

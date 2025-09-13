@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React from "react";
+import React, { Fragment } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { theme, themeStyles } from "@/theme";
@@ -18,17 +18,39 @@ import { LinearGradient } from "expo-linear-gradient";
 import Cast from "@/components/cast";
 import MovieList from "@/components/movieList";
 import Loading from "@/components/loading";
+import { fetchMovieDetails, image185 } from "@/api/moviedb";
+import { useLocalSearchParams } from "expo-router/build/hooks";
 
 const { width, height } = Dimensions.get("window");
 
 const MovieById = () => {
+  const { id } = useLocalSearchParams();
+
   const navigation = useNavigation();
   const [isFavorite, toggleFavorite] = React.useState(false);
   const [cast, setCast] = React.useState([1, 2, 3, 4, 5, 6]);
-  const [similarMovies, setSimilarMovies] = React.useState([1, 2, 3, 4, 5, 6]);
+  const [similarMovies, setSimilarMovies] = React.useState<IMoviesRes>();
+  const [movieDetails, setMovieDetails] = React.useState<IMovieDetails>();
+
   const [loading, setLoading] = React.useState(true);
 
-  const movieName = "movie namemooooooooooooooooo";
+  React.useEffect(() => {
+    setLoading(true);
+    getMovieDetails(id as string);
+  }, [id]);
+
+  const getMovieDetails = async (id: string) => {
+    try {
+      setLoading(true);
+      const data = await fetchMovieDetails(id);
+      if (data) setMovieDetails(data);
+      setSimilarMovies(data);
+    } catch (error) {
+      console.error("Error fetching movie details:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <ScrollView
@@ -88,7 +110,7 @@ const MovieById = () => {
         ) : (
           <View>
             <Image
-              source={require("assets/images/load.jpg")}
+              source={{ uri: image185(movieDetails.poster_path) }}
               style={{ width, height: height * 0.56 }}
             />
             <LinearGradient
@@ -120,18 +142,41 @@ const MovieById = () => {
         }}
       >
         {/* title */}
-        <Text style={styles.title}>{movieName}</Text>
+        <Text style={styles.title}>{movieDetails?.title}</Text>
 
         {/* status, realese, runTime */}
-        <Text style={styles.status}>Realese - 2022 - 160 min</Text>
+        <View style={styles.genres}>
+          <Text style={styles.genresText}>{movieDetails?.status}</Text>
+          <Text style={styles.genresText}>-</Text>
+          <Text style={styles.genresText}>
+            {movieDetails?.release_date.split("-")[0]}
+          </Text>
+          <Text style={styles.genresText}>-</Text>
+          <Text style={styles.genresText}>
+            {movieDetails?.runtime} min
+          </Text>{" "}
+        </View>
 
         {/* genres */}
         <View style={styles.genres}>
-          <Text style={styles.genresText}>Action</Text>
-          <Text style={styles.genresText}>-</Text>
-          <Text style={styles.genresText}>Thrill</Text>
-          <Text style={styles.genresText}>-</Text>
-          <Text style={styles.genresText}>Comedy</Text>{" "}
+          {movieDetails?.genres.map((el, index) => (
+            <Fragment key={el.id}>
+              <Text style={styles.genresText}>{el.name}</Text>
+              <Text
+                style={[
+                  styles.genresText,
+                  {
+                    display:
+                      index + 1 >= movieDetails?.genres.length
+                        ? "none"
+                        : "flex",
+                  },
+                ]}
+              >
+                -
+              </Text>
+            </Fragment>
+          ))}
         </View>
 
         {/* description */}
@@ -205,6 +250,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "medium",
     textAlign: "center",
-    marginHorizontal: 6,
+    marginHorizontal: 3,
   },
 });

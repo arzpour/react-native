@@ -48,13 +48,12 @@ const MovieList: React.FC<IMovieList> = ({
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 5, marginTop: 16 }}
       >
-        {data &&
-          data.results.length > 0 &&
-          data.results.map((item, index) => {
+        {data?.results?.length > 0 &&
+          data?.results?.map((item, index) => {
             return (
               <TouchableWithoutFeedback
                 key={index}
-                onPress={() => router.navigate(`/movie/${item}`)}
+                onPress={() => router.navigate(`/movie/${item?.id}`)}
               >
                 <View
                   style={{
@@ -65,7 +64,7 @@ const MovieList: React.FC<IMovieList> = ({
                   }}
                 >
                   <Image
-                    source={{ uri: image185(item.poster_path) }}
+                    source={{ uri: image185(item?.poster_path) }}
                     style={{
                       width: width * 0.29,
                       height: height * 0.22,
@@ -80,9 +79,9 @@ const MovieList: React.FC<IMovieList> = ({
                       marginBottom: 20,
                     }}
                   >
-                    {item.title.length > 10
-                      ? item.title.slice(0, 10) + "..."
-                      : item.title}{" "}
+                    {item?.title && item?.title.length > 10
+                      ? item?.title.slice(0, 10) + "..."
+                      : item?.title}{" "}
                   </Text>
                 </View>
               </TouchableWithoutFeedback>
