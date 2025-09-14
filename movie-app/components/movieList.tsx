@@ -18,7 +18,7 @@ const { width, height } = Dimensions.get("window");
 
 interface IMovieList {
   title: string;
-  data: IMoviesRes;
+  data: IMoviesRes | IPersonMovies;
   hideSeeAll?: boolean;
   className?: ViewStyle;
 }
@@ -31,64 +31,71 @@ const MovieList: React.FC<IMovieList> = ({
 }) => {
   const router = useRouter();
 
-  return (
-    <View style={[styles.container, className]}>
-      <View style={styles.head}>
-        <Text style={styles.title}>{title}</Text>
-        {!hideSeeAll && (
-          <TouchableOpacity>
-            <Text style={[themeStyles.text, { fontSize: 15 }]}>See All</Text>
-          </TouchableOpacity>
-        )}
-      </View>
+  const movieData = data as IMoviesRes;
+  const personMovieData = data as IPersonMovies;
 
-      {/* movie row */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 5, marginTop: 16 }}
-      >
-        {data?.results?.length > 0 &&
-          data?.results?.map((item, index) => {
-            return (
-              <TouchableWithoutFeedback
-                key={index}
-                onPress={() => router.navigate(`/movie/${item?.id}`)}
-              >
-                <View
-                  style={{
-                    margin: 10,
-                    marginLeft: 0,
-                    paddingRight: 5,
-                    justifyContent: "center",
-                  }}
+  const movieList = movieData?.results || personMovieData?.cast;
+
+  return (
+    movieList?.length > 0 && (
+      <View style={[styles.container, className]}>
+        <View style={styles.head}>
+          <Text style={styles.title}>{title}</Text>
+          {!hideSeeAll && (
+            <TouchableOpacity>
+              <Text style={[themeStyles.text, { fontSize: 15 }]}>See All</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {/* movie row */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 5, marginTop: 16 }}
+        >
+          {movieList?.length > 0 &&
+            movieList?.map((item, index) => {
+              return (
+                <TouchableWithoutFeedback
+                  key={index}
+                  onPress={() => router.navigate(`/movie/${item?.id}`)}
                 >
-                  <Image
-                    source={{ uri: image185(item?.poster_path) }}
+                  <View
                     style={{
-                      width: width * 0.29,
-                      height: height * 0.22,
-                      marginBottom: 10,
-                      borderRadius: 10,
-                    }}
-                  />
-                  <Text
-                    style={{
-                      color: "white",
-                      marginVertical: 7,
-                      marginBottom: 20,
+                      margin: 10,
+                      marginLeft: 0,
+                      paddingRight: 5,
+                      justifyContent: "center",
                     }}
                   >
-                    {item?.title && item?.title.length > 10
-                      ? item?.title.slice(0, 10) + "..."
-                      : item?.title}{" "}
-                  </Text>
-                </View>
-              </TouchableWithoutFeedback>
-            );
-          })}
-      </ScrollView>
-    </View>
+                    <Image
+                      source={{ uri: image185(item?.poster_path) }}
+                      style={{
+                        width: width * 0.29,
+                        height: height * 0.22,
+                        marginBottom: 10,
+                        borderRadius: 10,
+                      }}
+                    />
+                    <Text
+                      style={{
+                        color: "white",
+                        marginVertical: 4,
+                        marginBottom: 20,
+                      }}
+                    >
+                      {item?.title && item?.title.length > 10
+                        ? item?.title.slice(0, 10) + "..."
+                        : item?.title}{" "}
+                    </Text>
+                  </View>
+                </TouchableWithoutFeedback>
+              );
+            })}
+        </ScrollView>
+      </View>
+    )
   );
 };
 

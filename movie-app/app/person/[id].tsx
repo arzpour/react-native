@@ -11,15 +11,47 @@ import {
 import React from "react";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { themeStyles } from "@/theme";
-import { useNavigation } from "expo-router";
+import { useLocalSearchParams, useNavigation } from "expo-router";
 import MovieList from "@/components/movieList";
 import Loading from "@/components/loading";
+import { fetchPersonDetails, fetchPersonMovies, image342 } from "@/api/moviedb";
 
-const Person = () => {
+const PersonById = () => {
+  const { id } = useLocalSearchParams();
   const navigation = useNavigation();
-  const [isFavorite, toggleFavorite] = React.useState(false);
-  const [personMovies, setPersonMovies] = React.useState([1, 2, 3]);
+
+  const [isFavorite, setIsFavorite] = React.useState(false);
+  const [personMovies, setPersonMovies] = React.useState<IPersonMovies>();
+  const [personDetails, setPersonDetails] = React.useState<IPersonDetails>();
   const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    setLoading(true);
+    getPersonDetails(id as string);
+    getPersonMovies(id as string);
+  }, [id]);
+
+  const getPersonDetails = async (id: string) => {
+    try {
+      setLoading(true);
+      const data = await fetchPersonDetails(id);
+      if (data) setPersonDetails(data);
+    } catch (error) {
+      console.error("Error fetching movie details:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getPersonMovies = async (id: string) => {
+    try {
+      setLoading(true);
+      const data = await fetchPersonMovies(id);
+      if (data) setPersonMovies(data);
+    } catch (error) {
+      console.error("Error fetching movie details:", error);
+    }
+  };
 
   return (
     <ScrollView
@@ -44,7 +76,7 @@ const Person = () => {
             style={styles.backIcon}
           />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => toggleFavorite(!isFavorite)}>
+        <TouchableOpacity onPress={() => setIsFavorite(!isFavorite)}>
           <FontAwesome
             name="heart"
             size={24}
@@ -80,7 +112,7 @@ const Person = () => {
             >
               <Image
                 alt="person-image"
-                source={require("../assets/images/johnwick.jpg")}
+                source={{ uri: image342(personDetails?.profile_path) }}
                 style={{
                   width: 220,
                   height: 220,
@@ -92,12 +124,12 @@ const Person = () => {
 
           <View style={{ alignItems: "center" }}>
             <Text style={{ color: "white", fontSize: 20, fontWeight: "500" }}>
-              Keanu Reevs
+              {personDetails?.name}
             </Text>
             <Text
               style={{ color: "#afafafee", fontSize: 15, marginVertical: 8 }}
             >
-              London, United Kingdom
+              {personDetails?.place_of_birth}
             </Text>
           </View>
 
@@ -110,7 +142,6 @@ const Person = () => {
               marginVertical: 10,
               marginTop: 16,
               borderRadius: 100,
-              flex: 1,
               flexDirection: "row",
             }}
           >
@@ -123,7 +154,9 @@ const Person = () => {
               }}
             >
               <Text style={{ color: "white", marginBottom: 4 }}>Gender</Text>
-              <Text style={{ color: "#afafafee", fontSize: 12 }}>Male</Text>
+              <Text style={{ color: "#afafafee", fontSize: 12 }}>
+                {personDetails?.gender === 1 ? "Female" : "Male"}
+              </Text>
             </View>
             <View
               style={{
@@ -135,7 +168,7 @@ const Person = () => {
             >
               <Text style={{ color: "white", marginBottom: 4 }}>Birthday</Text>
               <Text style={{ color: "#afafafee", fontSize: 12 }}>
-                1964-09-02
+                {personDetails?.birthday}
               </Text>
             </View>
             <View
@@ -147,43 +180,44 @@ const Person = () => {
               }}
             >
               <Text style={{ color: "white", marginBottom: 4 }}>Known for</Text>
-              <Text style={{ color: "#afafafee", fontSize: 12 }}>Acting</Text>
-            </View>
-            <View
-              style={{
-                alignItems: "center",
-                paddingHorizontal: 10,
-              }}
-            >
-              <Text style={{ color: "white", marginBottom: 4 }}>
-                Popularity
+              <Text style={{ color: "#afafafee", fontSize: 12 }}>
+                {personDetails?.known_for_department}
               </Text>
-              <Text style={{ color: "#afafafee", fontSize: 12 }}>64.23</Text>
             </View>
+            {personDetails?.popularity && (
+              <View
+                style={{
+                  alignItems: "center",
+                  paddingHorizontal: 10,
+                }}
+              >
+                <Text style={{ color: "white", marginBottom: 4 }}>
+                  Popularity
+                </Text>
+                <Text style={{ color: "#afafafee", fontSize: 12 }}>
+                  {personDetails?.popularity.toFixed(2)} %
+                </Text>
+              </View>
+            )}
           </View>
 
-          <View
-            style={{
-              marginVertical: 20,
-              ...Platform.select({
-                android: { paddingHorizontal: 23 },
-                web: { paddingHorizontal: 9 },
-              }),
-            }}
-          >
-            <Text style={styles.title}>Biography</Text>
-            <Text style={styles.description}>
-              Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quo,
-              dolor pariatur dicta tempora voluptatibus voluptatum
-              exercitationem incidunt non perferendis architecto, quisquam
-              consequatur consequuntur beatae sunt quae at fugit aperiam
-              nostrum? Lorem ipsum dolor sit, amet consectetur adipisicing elit.
-              Quo, dolor pariatur dicta tempora voluptatibus voluptatum
-              exercitationem incidunt non perferendis architecto, quisquam
-              consequatur consequuntur beatae sunt quae at fugit aperiam
-              nostrum?
-            </Text>
-          </View>
+          {personDetails?.biography && (
+            <View
+              style={{
+                marginVertical: 20,
+                width: "100%",
+                flex: 1,
+                justifyContent: "flex-start",
+                ...Platform.select({
+                  android: { paddingHorizontal: 23 },
+                  web: { paddingHorizontal: 9 },
+                }),
+              }}
+            >
+              <Text style={styles.title}>Biography</Text>
+              <Text style={styles.description}>{personDetails?.biography}</Text>
+            </View>
+          )}
         </View>
       )}
 
@@ -212,7 +246,7 @@ const Person = () => {
   );
 };
 
-export default Person;
+export default PersonById;
 
 const styles = StyleSheet.create({
   container: {

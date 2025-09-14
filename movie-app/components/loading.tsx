@@ -1,5 +1,5 @@
 import * as Progress from "react-native-progress";
-import { Dimensions, View } from "react-native";
+import { View } from "react-native";
 import React from "react";
 import { theme } from "@/theme";
 
@@ -11,6 +11,7 @@ const Loading = () => {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
+        marginTop: 30,
       }}
     >
       <Progress.CircleSnail

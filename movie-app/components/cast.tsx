@@ -8,16 +8,23 @@ import {
 } from "react-native";
 import React from "react";
 import { useRouter } from "expo-router";
+import { image185 } from "@/api/moviedb";
 
 interface ICast {
-  cast: number[];
+  cast: IMovieCredits;
 }
 
-const Cast: React.FC<ICast> = ({ cast }) => {
-  const personName = "Keanu Reevs";
-  const characterName = "John wick";
-
+const Cast: React.FC<ICast> = ({ cast: casts }) => {
   const router = useRouter();
+
+  const cast = casts?.cast;
+
+  const handleClick = (item: number) => {
+    router.navigate({
+      pathname: "/person/[id]",
+      params: { id: String(item) },
+    });
+  };
 
   return (
     <View
@@ -30,17 +37,17 @@ const Cast: React.FC<ICast> = ({ cast }) => {
         contentContainerStyle={{ paddingVertical: 15 }}
       >
         {cast &&
-          cast.length > 0 &&
-          cast.map((el) => (
+          cast?.length > 0 &&
+          cast?.map((el) => (
             <TouchableOpacity
-              key={el}
+              key={el.id}
               style={{ marginHorizontal: 6 }}
-              onPress={() => router.navigate(`/person`)}
+              onPress={() => handleClick(el.id)}
             >
               <View
                 style={{
-                  width: 55,
-                  height: 55,
+                  width: 58,
+                  height: 58,
                   borderRadius: 100,
                   overflow: "hidden",
                   alignItems: "center",
@@ -52,19 +59,19 @@ const Cast: React.FC<ICast> = ({ cast }) => {
               >
                 <Image
                   alt={`person${el}`}
-                  source={require("../assets/images/johnwick.jpg")}
+                  source={{ uri: image185(el?.profile_path) }}
                   style={{ width: 55, height: 55, borderRadius: 100 }}
                 />
               </View>
               <Text style={{ color: "white", fontSize: 12 }}>
-                {characterName && characterName.length > 10
-                  ? characterName.slice(0, 10) + "..."
-                  : characterName}
+                {el?.character && el?.character.length > 10
+                  ? el?.character.slice(0, 10) + "..."
+                  : el?.character}
               </Text>
               <Text style={{ color: "#bdbdbdee", fontSize: 12, marginTop: 1 }}>
-                {personName && personName.length > 10
-                  ? personName.slice(0, 10) + "..."
-                  : personName}
+                {el?.name && el?.name.length > 10
+                  ? el?.name.slice(0, 10) + "..."
+                  : el?.name}
               </Text>
             </TouchableOpacity>
           ))}
