@@ -11,28 +11,62 @@ import {
   Dimensions,
 } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import React from "react";
+import React, { useCallback } from "react";
 import { useRouter } from "expo-router";
 import Loading from "@/components/loading";
+import { debounce } from "lodash";
+import { image185, searchMovies } from "@/api/moviedb";
 
 const Search = () => {
   const router = useRouter();
-  const [results, setResults] = React.useState([1, 2, 3, 4]);
-  const [loading, setLoading] = React.useState(true);
+  const [searchMovieResult, setSearchMovieResult] =
+    React.useState<IMoviesRes>();
+  const [loading, setLoading] = React.useState(false);
+  const [searchValue, setSearchValue] = React.useState<string>();
 
   const { height, width } = Dimensions.get("window");
 
-  const movieName = "Keanu Reevs";
+  const handleSearch = (value) => {
+    if (value && value.length > 2) {
+      setLoading(true);
+      searchMovies({
+        query: value,
+        page: 1,
+        include_adult: false,
+        language: "en-US",
+      }).then((data) => {
+        console.log(data);
+        if (data && data?.results?.length > 0) setSearchMovieResult(data);
+        setLoading(false);
+      });
+    } else {
+      setLoading(false);
+      setSearchMovieResult(null);
+    }
+  };
+
+  const handleTextDebounce = useCallback(debounce(handleSearch, 400), []);
 
   return (
     <SafeAreaView style={[styles.container, { padding: 20 }]}>
       <View style={styles.searchInput}>
         <TextInput
+          value={searchValue}
+          onChangeText={(text) => {
+            setSearchValue(text);
+            handleTextDebounce(text);
+          }}
           placeholder="Search Movie"
           placeholderTextColor={"lightgray"}
-          style={{ outline: "none", color: "white" }}
+          style={{ outline: "none", color: "white", width: "100%" }}
         />
-        <TouchableOpacity onPress={() => router.navigate("/")}>
+        <TouchableOpacity
+          onPress={() => {
+            router.navigate("/");
+            setSearchValue("");
+            setSearchMovieResult(null);
+          }}
+        >
           <AntDesign name="close" size={24} color="gray" />
         </TouchableOpacity>
       </View>
@@ -45,9 +79,11 @@ const Search = () => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ padding: 15 }}
         >
-          <Text style={{ color: "white" }}>
-            Results ({results ?? results?.length})
-          </Text>
+          {searchMovieResult?.results?.length > 0 && (
+            <Text style={{ color: "white" }}>
+              Results ({searchMovieResult?.results?.length})
+            </Text>
+          )}
           <View
             style={{
               display: "flex",
@@ -58,15 +94,21 @@ const Search = () => {
               marginVertical: 20,
             }}
           >
-            {results && results?.length > 0 ? (
-              results.map((item, index) => (
+            {searchMovieResult?.results &&
+            searchMovieResult?.results?.length > 0 ? (
+              searchMovieResult?.results?.map((item, index) => (
                 <TouchableWithoutFeedback
                   key={index}
-                  onPress={() => router.navigate(`/movie/${item}`)}
+                  onPress={() =>
+                    router.navigate({
+                      pathname: "/movie/[id]",
+                      params: { id: String(item.id) },
+                    })
+                  }
                 >
                   <View style={{ marginBottom: 10 }}>
                     <Image
-                      source={require("assets/images/00.jpg")}
+                      source={{ uri: image185(item?.poster_path) }}
                       style={{
                         width: width * 0.393,
                         height: height * 0.3,
@@ -74,9 +116,9 @@ const Search = () => {
                       }}
                     />
                     <Text style={{ color: "white", marginVertical: 10 }}>
-                      {movieName && movieName.length > 10
-                        ? movieName.slice(0, 10) + "..."
-                        : movieName}
+                      {item?.title && item?.title?.length > 10
+                        ? item?.title?.slice(0, 10) + "..."
+                        : item?.title}
                     </Text>
                   </View>
                 </TouchableWithoutFeedback>
@@ -117,5 +159,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    gap: 5,
   },
 });
