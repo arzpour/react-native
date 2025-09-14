@@ -119,6 +119,9 @@ const styles = StyleSheet.create({
     display: "flex",
     flex: 1,
     backgroundColor: "#262626",
+    ...Platform.select({
+      android: { paddingBottom: 16 },
+    }),
   },
   head: {
     display: "flex",

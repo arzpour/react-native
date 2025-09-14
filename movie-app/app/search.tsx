@@ -9,6 +9,7 @@ import {
   TouchableWithoutFeedback,
   Image,
   Dimensions,
+  Platform,
 } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import React, { useCallback } from "react";
@@ -65,6 +66,11 @@ const Search = () => {
             router.navigate("/");
             setSearchValue("");
             setSearchMovieResult(null);
+          }}
+          style={{
+            ...Platform.select({
+              android: { position: "absolute", right: 10 },
+            }),
           }}
         >
           <AntDesign name="close" size={24} color="gray" />
@@ -148,6 +154,9 @@ const styles = StyleSheet.create({
     display: "flex",
     flex: 1,
     backgroundColor: "#262626",
+    ...Platform.select({
+      android: { paddingTop: 50 },
+    }),
   },
   searchInput: {
     borderWidth: 1,
