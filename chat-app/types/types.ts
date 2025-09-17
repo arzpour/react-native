@@ -1,5 +1,5 @@
 import { Router } from "expo-router";
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import {
   TextInput,
   TextInputProps,
@@ -144,3 +144,19 @@ export type MessageProps = {
   isMe?: boolean;
   createdAt: string;
 };
+
+export interface ILoginResDto {
+  token: string;
+}
+
+export interface IError {
+  response: {
+    data: {
+      msg: string;
+    };
+  };
+}
+
+export interface IChildren {
+  children: React.ReactNode;
+}
