@@ -150,11 +150,8 @@ export interface ILoginResDto {
 }
 
 export interface IError {
-  response: {
-    data: {
-      msg: string;
-    };
-  };
+  response?: { data?: { msg?: string } };
+  message?: string;
 }
 
 export interface IChildren {

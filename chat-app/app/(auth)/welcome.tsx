@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import React from "react";
 import ScreenWrapper from "@/components/screenWrapper";
 import Typo from "@/components/typo";
@@ -11,7 +11,12 @@ import { useRouter } from "expo-router";
 const Welcome = () => {
   const router = useRouter();
   return (
-    <ScreenWrapper showPattern={true}>
+    <ScreenWrapper
+      showPattern={true}
+      style={{
+        ...(Platform.OS === "android" ? { paddingBottom: 20 } : {}),
+      }}
+    >
       <View style={styles.container}>
         <View style={{ alignItems: "center" }}>
           <Typo color={colors.white} fontWeight={"900"} size={43}>
@@ -38,7 +43,9 @@ const Welcome = () => {
         </View>
 
         <Button
-          style={{ backgroundColor: colors.white }}
+          style={{
+            backgroundColor: colors.white,
+          }}
           onPress={() => router.navigate("/(auth)/register")}
         >
           <Typo size={15} fontWeight={"bold"}>

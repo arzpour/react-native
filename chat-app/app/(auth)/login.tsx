@@ -18,6 +18,8 @@ import { verticalScale } from "@/utils/styling";
 import { useRouter } from "expo-router";
 import Entypo from "@expo/vector-icons/Entypo";
 import Button from "@/components/button";
+import { useAuth } from "@/contexts/authContext";
+import { IError } from "@/types/types";
 
 const Register = () => {
   const router = useRouter();
@@ -26,10 +28,30 @@ const Register = () => {
   const emailRef = React.useRef("");
   const passwordRef = React.useRef("");
 
-  const handleSubmit = () => {
+  const { signIn } = useAuth();
+
+  const handleSubmit = async () => {
     if (!emailRef.current || !passwordRef.current) {
-      Alert.alert("Login, Please fill all the fields");
+      Alert.alert("Login", "Please fill all the fields");
       return;
+    }
+
+    try {
+      setIsLoading(true);
+      await signIn(emailRef.current, passwordRef.current);
+    } catch (error: unknown) {
+      let message = "Login failed";
+
+      if (error && typeof error === "object" && "response" in error) {
+        const err = error as IError;
+        message = err.response?.data?.msg ?? err.message ?? message;
+      } else if (error instanceof Error) {
+        message = error.message;
+      }
+
+      Alert.alert("Login Error", message);
+    } finally {
+      setIsLoading(false);
     }
   };
 

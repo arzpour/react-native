@@ -5,10 +5,10 @@ import {
   UserProps,
 } from "@/types/types";
 import { useRouter } from "expo-router";
-import React, { createContext } from "react";
+import React, { createContext, useContext } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
-import { login } from "@/services/authService";
+import { login, register } from "@/services/authService";
 
 export const AuthContext = createContext<AuthContextProps>({
   token: null,
@@ -20,8 +20,8 @@ export const AuthContext = createContext<AuthContextProps>({
 });
 
 export const AuthProvider = ({ children }: IChildren) => {
-  const [token, setToken] = React.useState<string>();
-  const [user, setUser] = React.useState<UserProps>();
+  const [token, setToken] = React.useState<string | null>(null);
+  const [user, setUser] = React.useState<UserProps | null>(null);
   const router = useRouter();
 
   const updateToken = async (token: string) => {
@@ -41,4 +41,33 @@ export const AuthProvider = ({ children }: IChildren) => {
     await updateToken(response.token);
     router.replace("/(main)/home");
   };
+
+  const signUp = async (
+    email: string,
+    password: string,
+    name: string,
+    avatar?: string
+  ) => {
+    const response = await register(email, password, name, avatar);
+    console.log("🚀 ~ signIn ~ response:", response);
+    await updateToken(response.token);
+    router.replace("/(main)/home");
+  };
+
+  const signOut = async () => {
+    setToken(null);
+    setUser(null);
+    await AsyncStorage.removeItem("token");
+    router.replace("/(auth)/welcome");
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{ token, user, signIn, signUp, signOut, updateToken }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };
+
+export const useAuth = () => useContext(AuthContext);

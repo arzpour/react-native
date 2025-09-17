@@ -18,6 +18,8 @@ import { verticalScale } from "@/utils/styling";
 import { useRouter } from "expo-router";
 import Entypo from "@expo/vector-icons/Entypo";
 import Button from "@/components/button";
+import { useAuth } from "@/contexts/authContext";
+import { IError } from "@/types/types";
 
 const Register = () => {
   const router = useRouter();
@@ -27,10 +29,30 @@ const Register = () => {
   const emailRef = React.useRef("");
   const passwordRef = React.useRef("");
 
-  const handleSubmit = () => {
+  const { signUp } = useAuth();
+
+  const handleSubmit = async () => {
     if (!nameRef.current || !emailRef.current || !passwordRef.current) {
-      Alert.alert("Sign Up, Please fill all the fields");
+      Alert.alert("Sign Up", "Please fill all the fields");
       return;
+    }
+
+    try {
+      setIsLoading(true);
+      await signUp(emailRef.current, passwordRef.current, nameRef.current, "");
+    } catch (error: unknown) {
+      let message = "Registration failed";
+
+      if (error && typeof error === "object" && "response" in error) {
+        const err = error as IError;
+        message = err.response?.data?.msg ?? err.message ?? message;
+      } else if (error instanceof Error) {
+        message = error.message;
+      }
+
+      Alert.alert("Registration Error", message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -44,6 +66,7 @@ const Register = () => {
         style={{
           paddingTop: 10,
           paddingHorizontal: 0,
+          ...(Platform.OS === "android" ? { paddingTop: 20 } : {}),
         }}
       >
         <View style={styles.container}>

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, TextInput, Pressable } from "react-native";
 import React from "react";
 import { InputProps } from "@/types/types";
 import { colors, radius, spacingX } from "@/constants/theme";
@@ -6,25 +6,27 @@ import { verticalScale } from "@/utils/styling";
 
 const Input = (props: InputProps) => {
   const [isFocused, setIsFocused] = React.useState(false);
+  const inputRef = React.useRef<TextInput>(null);
 
   return (
-    <View
+    <Pressable
       style={[
         styles.container,
         props.containerStyle,
         isFocused && styles.primaryBorder,
       ]}
+      onPress={() => inputRef.current?.focus()}
     >
-      {props.icon ?? props.icon}
+      {props.icon}
       <TextInput
+        ref={inputRef}
         style={[styles.input, props.inputStyle]}
         placeholderTextColor={colors.neutral400}
-        ref={props.inputRef ?? props.inputRef}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         {...props}
       />
-    </View>
+    </Pressable>
   );
 };
 
@@ -52,6 +54,6 @@ const styles = StyleSheet.create({
     flex: 1,
     color: colors.text,
     fontSize: verticalScale(14),
-    width: "100%",
+    textAlign: "right",
   },
 });

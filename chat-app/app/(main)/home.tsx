@@ -1,14 +1,17 @@
-import { StyleSheet, Text, View } from "react-native";
+// import { StyleSheet } from "react-native";
 import React from "react";
+import ScreenWrapper from "@/components/screenWrapper";
+import Typo from "@/components/typo";
+import { colors } from "@/constants/theme";
 
-const home = () => {
+const Home = () => {
   return (
-    <View>
-      <Text>home</Text>
-    </View>
+    <ScreenWrapper style={{ padding: 10 }}>
+      <Typo color={colors.white}>Home</Typo>
+    </ScreenWrapper>
   );
 };
 
-export default home;
+export default Home;
 
-const styles = StyleSheet.create({});
+// const styles = StyleSheet.create({});
