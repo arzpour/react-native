@@ -7,6 +7,8 @@ export interface UserProps extends Document {
   name?: string;
   avatar?: string;
   created?: Date;
+  updated?: Date;
+  id: string;
 }
 
 export interface ConversationProps extends Document {
