@@ -8,14 +8,14 @@ import Loading from "./loading";
 const Button = ({ children, style, onPress, loading = false }: ButtonProps) => {
   if (loading) {
     return (
-      <View style={[style, styles.button, { backgroundColor: "transparent" }]}>
+      <View style={[styles.button, { backgroundColor: "transparent" }, style]}>
         <Loading />
       </View>
     );
   }
 
   return (
-    <TouchableOpacity style={[style, styles.button]} onPress={onPress}>
+    <TouchableOpacity style={[styles.button, style]} onPress={onPress}>
       {children}
     </TouchableOpacity>
   );

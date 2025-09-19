@@ -24,6 +24,49 @@ export const AuthProvider = ({ children }: IChildren) => {
   const [user, setUser] = React.useState<UserProps | null>(null);
   const router = useRouter();
 
+  React.useEffect(() => {
+    loadToken();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const loadToken = async () => {
+    const storedToken = await AsyncStorage.getItem("token");
+    if (storedToken) {
+      try {
+        const decoded = await jwtDecode<DecodedTokenProps>(storedToken);
+
+        if (decoded.exp && decoded.exp < Date.now() / 1000) {
+          // token has expired, navigate to welcome page
+          await AsyncStorage.removeItem("token");
+          goToWelcomePage();
+          return;
+        }
+
+        // user is logged in
+        setToken(storedToken);
+        setUser(decoded.user);
+        goToHomePage();
+      } catch (error) {
+        goToWelcomePage();
+        console.log("🚀 ~ loadToken ~ error:", error);
+      }
+    } else {
+      goToWelcomePage();
+    }
+  };
+
+  const goToWelcomePage = () => {
+    setTimeout(() => {
+      router.replace("/(auth)/welcome");
+    }, 1500);
+  };
+
+  const goToHomePage = () => {
+    setTimeout(() => {
+      router.replace("/(main)/home");
+    }, 1500);
+  };
+
   const updateToken = async (token: string) => {
     if (token) {
       setToken(token);
