@@ -12,6 +12,10 @@ const StackLayout = () => {
       />
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       <Stack.Screen name="(main)" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="(main)/profileModal"
+        options={{ presentation: "modal" }}
+      />
       <Stack.Screen name="+not-found" />
     </Stack>
   );
