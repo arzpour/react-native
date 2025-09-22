@@ -21,9 +21,11 @@ import { UserProps } from "@/types/types";
 import { scale, verticalScale } from "@/utils/styling";
 import Button from "@/components/button";
 import { useRouter } from "expo-router";
+import { updateProfile } from "@/socket/socketEvents";
+import * as ImagePicker from "expo-image-picker";
 
 const ProfileModal = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, updateToken } = useAuth();
   const [loading, setLoading] = React.useState<boolean>(false);
   const router = useRouter();
 
@@ -33,6 +35,25 @@ const ProfileModal = () => {
     avatar: null,
   });
 
+  const processUpdateProfile = (res: any) => {
+    console.log("🚀 ~ processUpdateProfile ~ res:", res);
+
+    setLoading(false);
+
+    if (res.success) {
+      updateToken(res.data.token);
+      router.back();
+    } else {
+      Alert.alert("User", res.msg);
+    }
+  };
+
+  React.useEffect(() => {
+    updateProfile(processUpdateProfile);
+
+    return () => updateProfile(processUpdateProfile);
+  }, []);
+
   React.useEffect(() => {
     setUserData({
       email: user?.email ?? "",
@@ -41,7 +62,19 @@ const ProfileModal = () => {
     });
   }, [user]);
 
-  const onSubmit = () => {};
+  const onSubmit = () => {
+    const { name, avatar } = userData;
+
+    if (!name.trim()) {
+      Alert.alert("User", "please enter yourr name");
+      return;
+    }
+
+    let data = { name, avatar };
+
+    setLoading(true);
+    updateProfile(data);
+  };
 
   const handleLogout = async () => {
     router.back();
@@ -63,6 +96,20 @@ const ProfileModal = () => {
     ]);
   };
 
+  const onPickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images", "videos", "livePhotos"],
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setUserData({ ...userData, avatar: result.assets[0].uri });
+    }
+  };
+
   return (
     <ScreenWrapper isModal={true} style={{ padding: 0 }}>
       <View style={styles.container}>
@@ -81,8 +128,8 @@ const ProfileModal = () => {
 
         <ScrollView contentContainerStyle={styles.form}>
           <View style={styles.avatarContainer}>
-            <Avatar uri={null} size={150} />
-            <TouchableOpacity style={styles.editIcon}>
+            <Avatar uri={userData.avatar as string} size={150} />
+            <TouchableOpacity style={styles.editIcon} onPress={onPickImage}>
               <MaterialIcons name="edit" size={24} color="black" />
             </TouchableOpacity>
           </View>

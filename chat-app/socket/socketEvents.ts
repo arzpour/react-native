@@ -16,3 +16,20 @@ export const testSocket = (payload: any, off: boolean = false) => {
     socket.emit("testSocket", payload);
   }
 };
+
+export const updateProfile = (payload: any, off: boolean = false) => {
+  const socket = getSocket();
+
+  if (!socket) {
+    console.log("socket is not connected");
+    return;
+  }
+
+  if (off) {
+    socket.off("updateProfile", payload);
+  } else if (typeof payload === "function") {
+    socket.on("updateProfile", payload);
+  } else {
+    socket.emit("updateProfile", payload);
+  }
+};
