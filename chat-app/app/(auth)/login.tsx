@@ -70,7 +70,7 @@ const Register = () => {
         <View style={styles.container}>
           <View style={styles.header}>
             <BackButton />
-            <Typo size={14} color={colors.white}>
+            <Typo size={15} color={colors.white}>
               Forget your password?
             </Typo>
           </View>
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     alignContent: "space-between",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingTop: spacingY._20,
+    paddingTop: spacingY._30,
     paddingBottom: spacingY._30,
     paddingHorizontal: spacingX._10,
   },

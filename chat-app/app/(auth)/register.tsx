@@ -72,7 +72,7 @@ const Register = () => {
         <View style={styles.container}>
           <View style={styles.header}>
             <BackButton />
-            <Typo size={14} color={colors.white}>
+            <Typo size={15} color={colors.white}>
               Need some help?
             </Typo>
           </View>
