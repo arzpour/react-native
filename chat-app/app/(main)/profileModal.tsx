@@ -23,6 +23,7 @@ import Button from "@/components/button";
 import { useRouter } from "expo-router";
 import { updateProfile } from "@/socket/socketEvents";
 import * as ImagePicker from "expo-image-picker";
+import { uploadFileToCloudinary } from "@/services/imageService";
 
 const ProfileModal = () => {
   const { user, signOut, updateToken } = useAuth();
@@ -62,17 +63,36 @@ const ProfileModal = () => {
     });
   }, [user]);
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     const { name, avatar } = userData;
 
     if (!name.trim()) {
-      Alert.alert("User", "please enter yourr name");
+      Alert.alert("User", "Please enter your name");
       return;
     }
 
     let data = { name, avatar };
 
-    setLoading(true);
+    let avatarExist =
+      Platform.OS === "web"
+        ? avatar &&
+          typeof avatar === "string" &&
+          (avatar.startsWith("data:") || avatar.startsWith("file:"))
+        : avatar;
+
+    if (avatarExist) {
+      setLoading(true);
+      const res = await uploadFileToCloudinary(avatar, "profile");
+
+      if (res.success) {
+        data.avatar = res.data;
+      } else {
+        Alert.alert("User", res.msg);
+        setLoading(false);
+        return;
+      }
+    }
+
     updateProfile(data);
   };
 
@@ -98,15 +118,19 @@ const ProfileModal = () => {
 
   const onPickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images", "videos", "livePhotos"],
+      mediaTypes: ["images"],
       aspect: [4, 3],
       quality: 1,
+      base64: true,
     });
 
-    console.log(result);
-
     if (!result.canceled) {
-      setUserData({ ...userData, avatar: result.assets[0].uri });
+      const file =
+        Platform.OS === "web"
+          ? `data:image/jpeg;base64,${result.assets[0].base64}`
+          : { uri: result.assets[0].uri };
+
+      setUserData({ ...userData, avatar: file });
     }
   };
 
@@ -117,7 +141,7 @@ const ProfileModal = () => {
           title="Update Profile"
           leftIcon={
             Platform.OS === "android" && (
-              <Ionicons name="chevron-back" size={22} color="black" />
+              <Ionicons name="chevron-back" size={24} color="black" />
             )
           }
           style={{

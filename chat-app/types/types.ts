@@ -21,7 +21,7 @@ export type TypoProps = {
 export interface UserProps {
   email: string;
   name: string;
-  avatar?: string | null;
+  avatar?: string | null | { uri: string };
   id?: string;
   // Add any additional fields from the token payload as needed
 }
