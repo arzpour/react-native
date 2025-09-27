@@ -26,7 +26,7 @@ const ScreenWrapper = ({
         flex: 1,
         backgroundColor: isModal ? colors.white : colors.neutral900,
       }}
-      imageStyle={{ opacity: showPattern ? bgOpacity : 0 }}
+      imageStyle={{ opacity: showPattern ? bgOpacity : 0, width: "100%" }}
       source={require("../assets/images/bgPattern.png")}
     >
       <View

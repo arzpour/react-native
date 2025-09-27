@@ -37,7 +37,6 @@ const ProfileModal = () => {
   });
 
   const processUpdateProfile = (res: any) => {
-    console.log("🚀 ~ processUpdateProfile ~ res:", res);
 
     setLoading(false);
 
