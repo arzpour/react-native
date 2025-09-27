@@ -55,5 +55,6 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontSize: verticalScale(14),
     textAlign: "right",
+    outline: "none",
   },
 });

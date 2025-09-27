@@ -1,10 +1,273 @@
-import { StyleSheet, View } from "react-native";
+import {
+  Alert,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React from "react";
+import { useLocalSearchParams } from "expo-router";
+import ScreenWrapper from "@/components/screenWrapper";
+import { colors, radius, spacingX, spacingY } from "@/constants/theme";
+import Header from "@/components/header";
+import BackButton from "@/components/backButton";
+import Avatar from "@/components/avatar";
+import * as ImagePicker from "expo-image-picker";
+import Input from "@/components/input";
+import Typo from "@/components/typo";
+import { useAuth } from "@/contexts/authContext";
+import Button from "@/components/button";
+import { verticalScale } from "@/utils/styling";
 
-const NewConversationModal = ({}) => {
-  return <View>NewConversationModal</View>;
+const contacts = [
+  {
+    id: "1",
+    name: "Liam Carter",
+    avatar: "https://i.pravatar.cc/150?img=11",
+  },
+  {
+    id: "2",
+    name: "Emma Davis",
+    avatar: "https://i.pravatar.cc/150?img=12",
+  },
+  {
+    id: "3",
+    name: "Noah Wilson",
+    avatar: "https://i.pravatar.cc/150?img=13",
+  },
+  {
+    id: "4",
+    name: "Olivia Moore",
+    avatar: "https://i.pravatar.cc/150?img=14",
+  },
+  {
+    id: "5",
+    name: "James Anderson",
+    avatar: "https://i.pravatar.cc/150?img=15",
+  },
+  {
+    id: "6",
+    name: "Ava Thomas",
+    avatar: "https://i.pravatar.cc/150?img=16",
+  },
+  {
+    id: "7",
+    name: "Ethan Miller",
+    avatar: "https://i.pravatar.cc/150?img=17",
+  },
+  {
+    id: "8",
+    name: "Sophia Teylor",
+    avatar: "https://i.pravatar.cc/150?img=18",
+  },
+  {
+    id: "9",
+    name: "Benjamin Harris",
+    avatar: "https://i.pravatar.cc/150?img=19",
+  },
+  {
+    id: "10",
+    name: "Mia Clark",
+    avatar: "https://i.pravatar.cc/150?img=20",
+  },
+];
+
+const NewConversationModal = () => {
+  const [groupAvatar, setGroupAvatar] = React.useState<string | null>();
+  const [groupName, setGroupName] = React.useState<string>();
+  const [selectedParticipants, setSelectedParticipants] = React.useState<
+    string[]
+  >([]);
+  const [isLoading, setIsLoading] = React.useState<boolean>();
+
+  const { isGroup } = useLocalSearchParams();
+  const { user: currentUser } = useAuth();
+
+  const isGroupMode = isGroup === "1";
+
+  const onPickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      aspect: [4, 3],
+      quality: 1,
+      base64: true,
+    });
+
+    if (!result.canceled) {
+      const file =
+        Platform.OS === "web"
+          ? `data:image/jpeg;base64,${result.assets[0].base64}`
+          : { uri: result.assets[0].uri };
+
+      setGroupAvatar(file as string);
+    }
+  };
+
+  const toggleParticipant = (user: any) => {
+    setSelectedParticipants((prev) => {
+      if (prev.includes(user.id)) {
+        return prev.filter((id) => id !== user.id);
+      }
+
+      return [...prev, user.id];
+    });
+  };
+
+  const onSelectUser = (user: any) => {
+    if (!currentUser) {
+      Alert.alert("Authentication", "Please login to start a conversation");
+      return;
+    }
+    if (isGroupMode) {
+      toggleParticipant(user);
+    }
+  };
+
+  const createGroup = () => {
+    if (!groupName?.trim() || !currentUser || selectedParticipants.length < 2)
+      return;
+  };
+
+  return (
+    <ScreenWrapper
+      isModal={true}
+      style={{ padding: 10, paddingTop: 16, height: "100%" }}
+    >
+      <View style={styles.container}>
+        <Header
+          title={isGroupMode ? "New Group" : "Select User"}
+          size={20}
+          leftIcon={<BackButton color="black" iconSize={20} />}
+          style={{
+            alignItems: "flex-start",
+            // marginBottom: 20,
+          }}
+        />
+
+        {isGroupMode && (
+          <View style={styles.groupInfoContainer}>
+            <View style={styles.avatarContainer}>
+              <TouchableOpacity onPress={onPickImage}>
+                <Avatar uri={groupAvatar ?? null} isGroup={true} size={100} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={{ width: "100%", marginTop: 20 }}>
+              <Input
+                placeholder="Group Name"
+                value={groupName}
+                onChangeText={setGroupName}
+                style={{ textAlign: "left", outline: "none" }}
+              />
+            </View>
+          </View>
+        )}
+
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={[
+            styles.contactList,
+            { paddingBottom: isGroupMode ? verticalScale(150) : spacingY._12 },
+          ]}
+        >
+          {contacts.map((user, index) => {
+            const isSelected = selectedParticipants.includes(user.id);
+            return (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.contactRow,
+                  isSelected && styles.selectedContact,
+                ]}
+                onPress={() => onSelectUser(user)}
+              >
+                <Avatar uri={user.avatar} size={45} />
+                <Typo fontWeight={"500"}>{user.name}</Typo>
+
+                {isGroupMode && (
+                  <View style={styles.selectionIndicator}>
+                    <View
+                      style={[styles.checkbox, isSelected && styles.checked]}
+                    />
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+
+        {isGroupMode && selectedParticipants.length >= 2 && (
+          <View style={styles.createGroupButton}>
+            <Button
+              onPress={createGroup}
+              disabled={!groupName?.trim()}
+              loading={isLoading}
+            >
+              <Typo fontWeight={"600"} size={17}>
+                Create Group
+              </Typo>
+            </Button>
+          </View>
+        )}
+      </View>
+    </ScreenWrapper>
+  );
 };
 
 export default NewConversationModal;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    marginHorizontal: spacingX._12,
+    marginVertical: spacingY._10,
+    height: "100%",
+  },
+  groupInfoContainer: {
+    marginTop: spacingY._20,
+    alignItems: "center",
+  },
+  avatarContainer: {
+    marginBottom: spacingY._10,
+    marginTop: spacingY._20,
+  },
+  contactList: {
+    gap: spacingY._12,
+    paddingTop: spacingY._10,
+    marginTop: spacingY._10,
+  },
+  contactRow: {
+    gap: spacingX._10,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: spacingY._5,
+  },
+  selectionIndicator: {
+    marginLeft: "auto",
+    marginRight: spacingX._10,
+  },
+  checkbox: {
+    width: 17,
+    height: 17,
+    borderWidth: 2,
+    borderRadius: 10,
+    borderColor: colors.primary,
+  },
+  checked: {
+    backgroundColor: colors.primary,
+  },
+  selectedContact: {
+    backgroundColor: colors.neutral100,
+    borderRadius: radius._30,
+  },
+  createGroupButton: {
+    position: "absolute",
+    right: 0,
+    left: 0,
+    bottom: 0,
+    borderTopWidth: 1,
+    borderTopColor: colors.neutral200,
+    backgroundColor: colors.white,
+    padding: spacingX._15,
+  },
+});

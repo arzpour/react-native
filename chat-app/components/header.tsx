@@ -1,14 +1,20 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import React from "react";
 import { HeaderProps } from "@/types/types";
 import Typo from "./typo";
 
-const Header = ({ leftIcon, rightIcon, style, title = "" }: HeaderProps) => {
+const Header = ({
+  leftIcon,
+  rightIcon,
+  style,
+  size,
+  title = "",
+}: HeaderProps) => {
   return (
     <View style={[styles.container, style]}>
       {leftIcon && <View style={styles.leftIcon}>{leftIcon}</View>}
-      {title && (
-        <Typo style={styles.title} size={17} fontWeight={"500"}>
+      {!!title && (
+        <Typo style={styles.title} size={size ?? 17} fontWeight={"500"}>
           {title}
         </Typo>
       )}

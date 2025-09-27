@@ -15,7 +15,7 @@ const BackButton = ({
 
   return (
     <TouchableOpacity
-      style={[style, styles.button]}
+      style={[styles.button, style]}
       onPress={() => router.back()}
     >
       <Ionicons
@@ -30,5 +30,7 @@ const BackButton = ({
 export default BackButton;
 
 const styles = StyleSheet.create({
-  button: {},
+  button: {
+    outline: "none",
+  },
 });

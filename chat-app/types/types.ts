@@ -100,6 +100,7 @@ export type HeaderProps = {
   style?: ViewStyle;
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
+  size?: number;
 };
 
 export type ConversationListItemProps = {
