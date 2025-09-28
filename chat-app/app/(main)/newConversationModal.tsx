@@ -7,7 +7,7 @@ import {
   View,
 } from "react-native";
 import React from "react";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import ScreenWrapper from "@/components/screenWrapper";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import Header from "@/components/header";
@@ -19,59 +19,66 @@ import Typo from "@/components/typo";
 import { useAuth } from "@/contexts/authContext";
 import Button from "@/components/button";
 import { verticalScale } from "@/utils/styling";
+import { getContacts, newConversation } from "@/socket/socketEvents";
 
-const contacts = [
-  {
-    id: "1",
-    name: "Liam Carter",
-    avatar: "https://i.pravatar.cc/150?img=11",
-  },
-  {
-    id: "2",
-    name: "Emma Davis",
-    avatar: "https://i.pravatar.cc/150?img=12",
-  },
-  {
-    id: "3",
-    name: "Noah Wilson",
-    avatar: "https://i.pravatar.cc/150?img=13",
-  },
-  {
-    id: "4",
-    name: "Olivia Moore",
-    avatar: "https://i.pravatar.cc/150?img=14",
-  },
-  {
-    id: "5",
-    name: "James Anderson",
-    avatar: "https://i.pravatar.cc/150?img=15",
-  },
-  {
-    id: "6",
-    name: "Ava Thomas",
-    avatar: "https://i.pravatar.cc/150?img=16",
-  },
-  {
-    id: "7",
-    name: "Ethan Miller",
-    avatar: "https://i.pravatar.cc/150?img=17",
-  },
-  {
-    id: "8",
-    name: "Sophia Teylor",
-    avatar: "https://i.pravatar.cc/150?img=18",
-  },
-  {
-    id: "9",
-    name: "Benjamin Harris",
-    avatar: "https://i.pravatar.cc/150?img=19",
-  },
-  {
-    id: "10",
-    name: "Mia Clark",
-    avatar: "https://i.pravatar.cc/150?img=20",
-  },
-];
+// const contacts = [
+//   {
+//     id: "1",
+//     name: "Liam Carter",
+//     avatar: "https://i.pravatar.cc/150?img=11",
+//   },
+//   {
+//     id: "2",
+//     name: "Emma Davis",
+//     avatar: "https://i.pravatar.cc/150?img=12",
+//   },
+//   {
+//     id: "3",
+//     name: "Noah Wilson",
+//     avatar: "https://i.pravatar.cc/150?img=13",
+//   },
+//   {
+//     id: "4",
+//     name: "Olivia Moore",
+//     avatar: "https://i.pravatar.cc/150?img=14",
+//   },
+//   {
+//     id: "5",
+//     name: "James Anderson",
+//     avatar: "https://i.pravatar.cc/150?img=15",
+//   },
+//   {
+//     id: "6",
+//     name: "Ava Thomas",
+//     avatar: "https://i.pravatar.cc/150?img=16",
+//   },
+//   {
+//     id: "7",
+//     name: "Ethan Miller",
+//     avatar: "https://i.pravatar.cc/150?img=17",
+//   },
+//   {
+//     id: "8",
+//     name: "Sophia Teylor",
+//     avatar: "https://i.pravatar.cc/150?img=18",
+//   },
+//   {
+//     id: "9",
+//     name: "Benjamin Harris",
+//     avatar: "https://i.pravatar.cc/150?img=19",
+//   },
+//   {
+//     id: "10",
+//     name: "Mia Clark",
+//     avatar: "https://i.pravatar.cc/150?img=20",
+//   },
+// ];
+
+interface IConatcts {
+  id: string;
+  name: string;
+  avatar: string;
+}
 
 const NewConversationModal = () => {
   const [groupAvatar, setGroupAvatar] = React.useState<string | null>();
@@ -79,12 +86,52 @@ const NewConversationModal = () => {
   const [selectedParticipants, setSelectedParticipants] = React.useState<
     string[]
   >([]);
+  const [contacts, setContacts] = React.useState<IConatcts[]>([]);
+  console.log("🚀 ~ NewConversationModal ~ contacts:", contacts);
   const [isLoading, setIsLoading] = React.useState<boolean>();
 
   const { isGroup } = useLocalSearchParams();
   const { user: currentUser } = useAuth();
+  const router = useRouter();
 
   const isGroupMode = isGroup === "1";
+
+  React.useEffect(() => {
+    getContacts(processGetContacts);
+    getContacts(null);
+    newConversation(processNewConversation);
+
+    return () => {
+      getContacts(processGetContacts, true);
+      newConversation(processNewConversation, true);
+    };
+  }, []);
+
+  const processGetContacts = (res: any) => {
+    if (res.success) {
+      setContacts(res.data);
+    }
+  };
+
+  const processNewConversation = (res: any) => {
+    console.log("🚀 ~ processNewConversation ~ res:", res);
+    if (res.success) {
+      router.back();
+      router.push({
+        pathname: "/(main)/conversation",
+        params: {
+          id: res.data.id,
+          name: res.data.name,
+          avatar: res.data.avatar,
+          type: res.data.type,
+          participants: JSON.stringify(res.data.participants),
+        },
+      });
+    } else {
+      console.log("Error creating conversation", res.msg);
+      Alert.alert("Error", res.msg);
+    }
+  };
 
   const onPickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -121,6 +168,11 @@ const NewConversationModal = () => {
     }
     if (isGroupMode) {
       toggleParticipant(user);
+    } else {
+      newConversation({
+        type: "direct",
+        participants: [currentUser.id, user.id],
+      });
     }
   };
 
@@ -142,6 +194,8 @@ const NewConversationModal = () => {
           style={{
             alignItems: "flex-start",
             // marginBottom: 20,
+            flex: 0,
+            marginBottom: 20,
           }}
         />
 
@@ -171,7 +225,7 @@ const NewConversationModal = () => {
             { paddingBottom: isGroupMode ? verticalScale(150) : spacingY._12 },
           ]}
         >
-          {contacts.map((user, index) => {
+          {(contacts ?? []).map((user, index) => {
             const isSelected = selectedParticipants.includes(user.id);
             return (
               <TouchableOpacity
