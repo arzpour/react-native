@@ -1,5 +1,6 @@
 import { Server as SocketIOServer, Socket } from "socket.io";
 import Conversation from "../modals/Conversation";
+import Message from "../modals/Message";
 
 export const registerChatEvents = async (
   io: SocketIOServer,
@@ -23,7 +24,7 @@ export const registerChatEvents = async (
         .sort({ updatedAt: -1 })
         .populate({
           path: "lastMessage",
-          select: "content senderId attachement createdAt",
+          select: "content senderId attachment createdAt",
         })
         .populate({
           path: "participants",
@@ -108,6 +109,44 @@ export const registerChatEvents = async (
       socket.emit("newConversation", {
         success: false,
         msg: "Failed to create conversation",
+      });
+    }
+  });
+
+  socket.on("newMessage", async (data) => {
+    console.log("🚀 ~ registerChatEvents ~ data:", data);
+    try {
+      const message = await Message.create({
+        conversationId: data.conversationId,
+        senderId: data.sender.id,
+        content: data.content,
+        attachment: data.attachment,
+      });
+
+      io.to(data.conversationId).emit("newMessage", {
+        success: true,
+        data: {
+          id: message._id,
+          content: data.content,
+          sender: {
+            id: data.sender.id,
+            name: data.sender.name,
+            avatar: data.sender.avatar,
+          },
+          attachment: data.attachment,
+          createdAt: new Date().toISOString(),
+          conversationId: data.conversationId,
+        },
+      });
+
+      await Conversation.findByIdAndUpdate(data.conversationId, {
+        lastMessage: message._id,
+      });
+    } catch (error) {
+      console.log("🚀 ~ registerChatEvents ~ error:", error);
+      socket.emit("newConversation", {
+        success: false,
+        msg: "Failed to send message",
       });
     }
   });

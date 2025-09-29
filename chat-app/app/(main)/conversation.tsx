@@ -24,6 +24,7 @@ import Input from "@/components/input";
 import * as ImagePicker from "expo-image-picker";
 import Loading from "@/components/loading";
 import { uploadFileToCloudinary } from "@/services/imageService";
+import { newMessage } from "@/socket/socketEvents";
 
 const dummyMessages = [
   {
@@ -110,6 +111,19 @@ const Conversation = () => {
 
   let conversationName = isDirect ? otherParticipants.name : name;
 
+  React.useEffect(() => {
+    newMessage(newMessageHandler);
+
+    return () => {
+      newMessage(newMessageHandler, true);
+    };
+  }, []);
+
+  const newMessageHandler = (res: any) => {
+    console.log("🚀 ~ newMessageHandler ~ res:", res);
+    setIsLoading(false);
+  };
+
   const onPickFile = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
@@ -149,6 +163,20 @@ const Conversation = () => {
         }
       }
       console.log("🚀 ~ onSend ~ attachment:", attachment);
+
+      newMessage({
+        conversationId,
+        sender: {
+          id: currentUser.id,
+          name: currentUser.name,
+          avatar: currentUser.avatar,
+        },
+        content: message.trim(),
+        attachment,
+      });
+
+      setMessage("");
+      setSelectedFile(null);
     } catch (error) {
       console.log("🚀 ~ onSend ~ error:", error);
       Alert.alert("Error", "Failed to send message");

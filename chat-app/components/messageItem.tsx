@@ -37,7 +37,7 @@ const MessageItem = ({ isDirect, item }: IMessageItem) => {
         )}
         {!!item.content && <Typo size={15}>{item.content}</Typo>}
         <Typo
-          style={{ alignSelf: "flex-end", marginTop: 2 }}
+          style={{ alignSelf: "flex-end", marginTop: 1 }}
           size={11}
           color={colors.neutral600}
           fontWeight={"500"}

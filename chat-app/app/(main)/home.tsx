@@ -1,7 +1,13 @@
 import React from "react";
 import ScreenWrapper from "@/components/screenWrapper";
 import Typo from "@/components/typo";
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import { useAuth } from "@/contexts/authContext";
 import {
@@ -213,13 +219,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingBottom: spacingY._25,
-    paddingTop: spacingY._20,
+    ...(Platform.OS === "web" && { paddingTop: spacingY._20 }),
     paddingHorizontal: spacingX._15,
   },
   settingIcon: {
     padding: spacingY._7,
     backgroundColor: colors.neutral700,
     borderRadius: radius.full,
+    position: "relative",
+    top: 8,
+    ...(Platform.OS === "web" && { top: 4 }),
   },
   content: {
     flex: 1,
@@ -227,7 +236,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: radius._50,
     borderTopLeftRadius: radius._50,
     borderCurve: "continuous",
-    // paddingHorizontal: spacingX._20,
     overflow: "hidden",
   },
   navbar: {
