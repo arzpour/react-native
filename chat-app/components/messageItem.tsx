@@ -4,6 +4,10 @@ import { MessageProps } from "@/types/types";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import Avatar from "./avatar";
 import Typo from "./typo";
+import { useAuth } from "@/contexts/authContext";
+import moment from "moment";
+import { Image } from "expo-image";
+import { verticalScale } from "@/utils/styling";
 
 interface IMessageItem {
   item: MessageProps;
@@ -11,7 +15,12 @@ interface IMessageItem {
 }
 
 const MessageItem = ({ isDirect, item }: IMessageItem) => {
-  const isMe = item.isMe;
+  const { user: currentUser } = useAuth();
+  const isMe = currentUser?.id === item.sender.id;
+
+  const formattedDate = moment(item.createdAt).isSame(moment(), "day")
+    ? moment(item.createdAt).format("h:mm A")
+    : moment(item.createdAt).format("MMM D, h:mm A");
 
   return (
     <View
@@ -21,7 +30,11 @@ const MessageItem = ({ isDirect, item }: IMessageItem) => {
       ]}
     >
       {!isMe && !isDirect && (
-        <Avatar uri={null} style={styles.messageAvatar} size={30} />
+        <Avatar
+          uri={item.sender.avatar}
+          style={styles.messageAvatar}
+          size={30}
+        />
       )}
 
       <View
@@ -31,18 +44,28 @@ const MessageItem = ({ isDirect, item }: IMessageItem) => {
         ]}
       >
         {!isMe && !isDirect && (
-          <Typo size={13} color={colors.neutral900} fontWeight={"600"}>
+          <Typo size={14} color={colors.neutral900} fontWeight={"600"}>
             {item.sender?.name}
           </Typo>
         )}
+
+        {item.attachment && (
+          <Image
+            source={item.attachment}
+            contentFit="cover"
+            transition={100}
+            style={styles.attachment}
+          />
+        )}
+
         {!!item.content && <Typo size={15}>{item.content}</Typo>}
         <Typo
-          style={{ alignSelf: "flex-end", marginTop: 1 }}
+          style={{ alignSelf: "flex-end" }}
           size={11}
           color={colors.neutral600}
           fontWeight={"500"}
         >
-          {item.createdAt}
+          {formattedDate}
         </Typo>
       </View>
     </View>
@@ -76,5 +99,10 @@ const styles = StyleSheet.create({
   },
   theirBubble: {
     backgroundColor: colors.otherBubble,
+  },
+  attachment: {
+    height: verticalScale(180),
+    width: verticalScale(180),
+    borderRadius: radius._10,
   },
 });

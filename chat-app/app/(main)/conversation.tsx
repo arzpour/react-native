@@ -1,7 +1,6 @@
 import {
   Alert,
   FlatList,
-  Image,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -24,65 +23,10 @@ import Input from "@/components/input";
 import * as ImagePicker from "expo-image-picker";
 import Loading from "@/components/loading";
 import { uploadFileToCloudinary } from "@/services/imageService";
-import { newMessage } from "@/socket/socketEvents";
+import { getMessages, newMessage } from "@/socket/socketEvents";
+import { MessageProps, ResponseProps } from "@/types/types";
+import { Image } from "expo-image";
 
-const dummyMessages = [
-  {
-    id: "msg_10",
-    sender: {
-      id: "user_2",
-      name: "Jane Smith",
-      avatar: null,
-    },
-    content: "that would be really useful!",
-    createdAt: "10:42 AM",
-    isMe: false,
-  },
-  {
-    id: "msg_9",
-    sender: {
-      id: "user",
-      name: "Bilmem ne",
-      avatar: null,
-    },
-    content: "that would be really useful!",
-    createdAt: "10:42 AM",
-    isMe: true,
-  },
-  {
-    id: "msg_8",
-    sender: {
-      id: "user_0",
-      name: "Jane",
-      avatar: null,
-    },
-    content: "that would be really useful!",
-    createdAt: "10:42 AM",
-    isMe: false,
-  },
-  {
-    id: "msg_7",
-    sender: {
-      id: "msg",
-      name: "Smith",
-      avatar: null,
-    },
-    content: "that would be really useful!",
-    createdAt: "10:42 AM",
-    isMe: true,
-  },
-  {
-    id: "msg_6",
-    sender: {
-      id: "user_1",
-      name: "thats me",
-      avatar: null,
-    },
-    content: "that would be really useful!",
-    createdAt: "10:42 AM",
-    isMe: false,
-  },
-];
 type FileType = string | { uri: string } | null;
 const Conversation = () => {
   const {
@@ -95,6 +39,7 @@ const Conversation = () => {
   const [message, setMessage] = React.useState<string>("");
   const [selectedFile, setSelectedFile] = React.useState<FileType>();
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [messages, setMessages] = React.useState<MessageProps[]>([]);
 
   const { user: currentUser } = useAuth();
 
@@ -113,15 +58,30 @@ const Conversation = () => {
 
   React.useEffect(() => {
     newMessage(newMessageHandler);
+    getMessages(messagesHandler);
+
+    getMessages({ conversationId });
 
     return () => {
       newMessage(newMessageHandler, true);
+      getMessages(messagesHandler, true);
     };
   }, []);
 
-  const newMessageHandler = (res: any) => {
+  const newMessageHandler = (res: ResponseProps) => {
     console.log("🚀 ~ newMessageHandler ~ res:", res);
     setIsLoading(false);
+    if (res.success) {
+      if (res.data.conversationId === conversationId) {
+        setMessages((prev) => [res.data, ...prev]);
+      } else {
+        Alert.alert("Error", res.msg);
+      }
+    }
+  };
+
+  const messagesHandler = (res: ResponseProps) => {
+    if (res.success) setMessages(res.data);
   };
 
   const onPickFile = async () => {
@@ -191,6 +151,7 @@ const Conversation = () => {
         ...(Platform.OS === "web" && { padding: 0 }),
         padding: 0,
         margin: 0,
+        // height: "100%",
       }}
       showPattern={true}
       bgOpacity={0.5}
@@ -229,7 +190,7 @@ const Conversation = () => {
         {/* messages  */}
         <View style={styles.content}>
           <FlatList
-            data={dummyMessages}
+            data={messages}
             inverted={true}
             showsVerticalScrollIndicator={false}
             keyExtractor={(item) => item.id}

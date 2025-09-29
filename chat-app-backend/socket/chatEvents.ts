@@ -37,7 +37,7 @@ export const registerChatEvents = async (
         data: conversations,
       });
     } catch (error) {
-      console.log("🚀 ~ registerChatEvents ~ error:", error);
+      console.log("🚀 ~ get conversation ~ error:", error);
       socket.emit("getConversation", {
         success: false,
         msg: "Failed to create conversation",
@@ -58,7 +58,7 @@ export const registerChatEvents = async (
           })
           .lean();
         console.log(
-          "🚀 ~ registerChatEvents ~ existingConversation:",
+          "🚀 ~ new conversation ~ existingConversation:",
           existingConversation
         );
 
@@ -105,7 +105,7 @@ export const registerChatEvents = async (
         data: { ...populatedConversation, isNew: true },
       });
     } catch (error) {
-      console.log("🚀 ~ registerChatEvents ~ error:", error);
+      console.log("🚀 ~ new conversation ~ error:", error);
       socket.emit("newConversation", {
         success: false,
         msg: "Failed to create conversation",
@@ -114,7 +114,6 @@ export const registerChatEvents = async (
   });
 
   socket.on("newMessage", async (data) => {
-    console.log("🚀 ~ registerChatEvents ~ data:", data);
     try {
       const message = await Message.create({
         conversationId: data.conversationId,
@@ -143,10 +142,46 @@ export const registerChatEvents = async (
         lastMessage: message._id,
       });
     } catch (error) {
-      console.log("🚀 ~ registerChatEvents ~ error:", error);
+      console.log("🚀 ~ send message ~ error:", error);
       socket.emit("newConversation", {
         success: false,
         msg: "Failed to send message",
+      });
+    }
+  });
+
+  socket.on("getMessages", async (data) => {
+    console.log("🚀 ~ get messages ~ data:", data);
+    try {
+      const messages = await Message.find({
+        conversationId: data.conversationId,
+      })
+        .sort({ createdAt: -1 })
+        .populate<{ senderId: { _id: string; name: string; avatar: string } }>({
+          path: "senderId",
+          select: "name avatar",
+        })
+        .lean();
+
+      const messagesWithSender = messages.map((message) => ({
+        ...message,
+        id: message._id,
+        sender: {
+          id: message.senderId._id,
+          name: message.senderId.name,
+          avatar: message.senderId.avatar,
+        },
+      }));
+
+      socket.emit("getMessages", {
+        success: true,
+        data: messagesWithSender,
+      });
+    } catch (error) {
+      console.log("🚀 ~ get messages ~ error:", error);
+      socket.emit("getMessages", {
+        success: false,
+        msg: "Failed to fetch messages",
       });
     }
   });
