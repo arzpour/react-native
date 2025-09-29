@@ -12,8 +12,8 @@ const Input = (props: InputProps) => {
     <Pressable
       style={[
         styles.container,
-        props.containerStyle,
         isFocused && styles.primaryBorder,
+        props.containerStyle,
       ]}
       onPress={() => inputRef.current?.focus()}
     >

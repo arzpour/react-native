@@ -5,9 +5,46 @@ export const registerChatEvents = async (
   io: SocketIOServer,
   socket: Socket
 ) => {
-  socket.on("newConversation", async (data) => {
-    console.log("🚀 ~ registerChatEvents ~ data:", data);
+  socket.on("getConversation", async () => {
+    try {
+      const userId = socket.data.userId;
 
+      if (!userId) {
+        socket.emit("getConversation", {
+          success: false,
+          msg: "Unauthorized",
+        });
+        return;
+      }
+
+      const conversations = await Conversation.find({
+        participants: userId,
+      })
+        .sort({ updatedAt: -1 })
+        .populate({
+          path: "lastMessage",
+          select: "content senderId attachement createdAt",
+        })
+        .populate({
+          path: "participants",
+          select: "name avatar email",
+        })
+        .lean();
+
+      socket.emit("getConversation", {
+        success: true,
+        data: conversations,
+      });
+    } catch (error) {
+      console.log("🚀 ~ registerChatEvents ~ error:", error);
+      socket.emit("getConversation", {
+        success: false,
+        msg: "Failed to create conversation",
+      });
+    }
+  });
+
+  socket.on("newConversation", async (data) => {
     try {
       if (data.type === "direct") {
         const existingConversation = await Conversation.findOne({

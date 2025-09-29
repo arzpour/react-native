@@ -5,6 +5,7 @@ import Avatar from "./avatar";
 import { colors, spacingX, spacingY } from "@/constants/theme";
 import Typo from "./typo";
 import moment from "moment";
+import { useAuth } from "@/contexts/authContext";
 
 const ConversationItem = ({
   item,
@@ -12,7 +13,16 @@ const ConversationItem = ({
   showDivider,
   isGroup,
 }: ConversationListItemProps) => {
+  const { user: currentUser } = useAuth();
   const lastMessage = item.lastMessage;
+  const isDirect = item.type === "direct";
+  let avatar = item.avatar;
+
+  const otherParticipants = isDirect
+    ? item.participants.find((p) => p._id !== currentUser?.id)
+    : null;
+
+  if (isDirect && otherParticipants) avatar = otherParticipants.avatar;
 
   const getLastMessageDate = () => {
     if (!lastMessage?.createdAt) return null;
@@ -36,7 +46,18 @@ const ConversationItem = ({
     return lastMessage.attachment ? "Image" : lastMessage.content;
   };
 
-  const openConversation = () => {};
+  const openConversation = () => {
+    router.push({
+      pathname: "/(main)/conversation",
+      params: {
+        id: item._id,
+        name: item.name,
+        avatar: item.avatar,
+        type: item.type,
+        participants: JSON.stringify(item.participants),
+      },
+    });
+  };
   return (
     <View>
       <TouchableOpacity
@@ -44,13 +65,13 @@ const ConversationItem = ({
         onPress={openConversation}
       >
         <View>
-          <Avatar uri={null} size={47} isGroup={item.type === "group"} />
+          <Avatar uri={avatar} size={47} isGroup={item.type === "group"} />
         </View>
 
         <View style={{ flex: 1 }}>
           <View style={styles.row}>
             <Typo size={17} fontWeight={"600"}>
-              {item.name}
+              {isDirect ? otherParticipants?.name : item.name}
             </Typo>
             {!!item.lastMessage && (
               <Typo size={15}>{getLastMessageDate()}</Typo>

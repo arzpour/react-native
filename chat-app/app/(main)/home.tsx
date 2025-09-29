@@ -4,7 +4,11 @@ import Typo from "@/components/typo";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import { useAuth } from "@/contexts/authContext";
-import { testSocket } from "@/socket/socketEvents";
+import {
+  getConversations,
+  newConversation,
+  testSocket,
+} from "@/socket/socketEvents";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import ConversationItem from "@/components/conversationItem";
@@ -12,63 +16,23 @@ import Loading from "@/components/loading";
 import Button from "@/components/button";
 import { AntDesign } from "@expo/vector-icons";
 import { verticalScale } from "@/utils/styling";
-
-const conversations = [
-  {
-    name: "Alice",
-    type: "direct",
-    lastMessage: {
-      senderName: "Alice",
-      // attachment: { image: "ss" },
-      content: "Hello, how are you?",
-      createdAt: "2025-06-22T18:45:00Z",
-    },
-  },
-  {
-    name: "Project team",
-    type: "group",
-    lastMessage: {
-      senderName: "Sarah",
-      content: "What’s the last picture you took on your phone?",
-      createdAt: "2025-06-21T22:10:00Z",
-    },
-  },
-  {
-    name: "Bob",
-    type: "direct",
-    lastMessage: {
-      senderName: "Bob",
-      content: "Do you have a guilty pleasure TV show?",
-      createdAt: "2025-06-12T10:18:00Z",
-    },
-  },
-  {
-    name: "Family group",
-    type: "group",
-    lastMessage: {
-      senderName: "Mom",
-      content: "Hello, how are you?",
-      createdAt: "2025-06-10T20:12:00Z",
-    },
-  },
-  {
-    name: "Charlie",
-    type: "direct",
-    lastMessage: {
-      senderName: "Charlie",
-      content: "Thanks!",
-      createdAt: "2025-06-22T20:18:00Z",
-    },
-  },
-];
+import { ConversationProps, ResponseProps } from "@/types/types";
 
 const Home = () => {
   const [selectedTab, setSelectedTab] = React.useState(0);
   const [loading, setLoading] = React.useState(false);
+  const [conversations, setConversations] = React.useState<ConversationProps[]>(
+    []
+  );
 
   const { user } = useAuth();
-  console.log("🚀 ~ Home ~ user:", user);
   const router = useRouter();
+
+  const processConversations = (res: ResponseProps) => {
+    if (res.success) {
+      setConversations(res.data);
+    }
+  };
 
   React.useEffect(() => {
     testSocket(testSocketCallbackHandler);
@@ -79,13 +43,31 @@ const Home = () => {
     };
   }, []);
 
+  React.useEffect(() => {
+    getConversations(processConversations);
+    newConversation(newConversationHandler);
+
+    getConversations(null);
+
+    return () => {
+      getConversations(processConversations, true);
+      newConversation(newConversationHandler, true);
+    };
+  }, []);
+
+  const newConversationHandler = (res: ResponseProps) => {
+    if (res.success && res.data?.isNew) {
+      setConversations((prev) => [...prev, res.data]);
+    }
+  };
+
   const testSocketCallbackHandler = (data: any) => {
     console.log("got response from testSocket event: ", data);
   };
 
   const directConversation = conversations
-    .filter((item) => item.type === "direct")
-    .sort((a, b) => {
+    .filter((item: ConversationProps) => item.type === "direct")
+    .sort((a: ConversationProps, b: ConversationProps) => {
       const aDate = a.lastMessage?.createdAt;
       const bDate = b.lastMessage?.createdAt;
       return (
@@ -95,8 +77,8 @@ const Home = () => {
     });
 
   const groupConversation = conversations
-    .filter((item) => item.type === "group")
-    .sort((a, b) => {
+    .filter((item: ConversationProps) => item.type === "group")
+    .sort((a: ConversationProps, b: ConversationProps) => {
       const aDate = a.lastMessage?.createdAt;
       const bDate = b.lastMessage?.createdAt;
       return (
@@ -165,7 +147,7 @@ const Home = () => {
 
             <View style={styles.conversationList}>
               {selectedTab === 0 &&
-                directConversation.map((item: any, index) => (
+                directConversation.map((item: ConversationProps, index) => (
                   <ConversationItem
                     item={item}
                     key={index}
@@ -174,7 +156,7 @@ const Home = () => {
                   />
                 ))}
               {selectedTab === 1 &&
-                groupConversation.map((item: any, index) => (
+                groupConversation.map((item: ConversationProps, index) => (
                   <ConversationItem
                     item={item}
                     key={index}

@@ -20,59 +20,7 @@ import { useAuth } from "@/contexts/authContext";
 import Button from "@/components/button";
 import { verticalScale } from "@/utils/styling";
 import { getContacts, newConversation } from "@/socket/socketEvents";
-
-// const contacts = [
-//   {
-//     id: "1",
-//     name: "Liam Carter",
-//     avatar: "https://i.pravatar.cc/150?img=11",
-//   },
-//   {
-//     id: "2",
-//     name: "Emma Davis",
-//     avatar: "https://i.pravatar.cc/150?img=12",
-//   },
-//   {
-//     id: "3",
-//     name: "Noah Wilson",
-//     avatar: "https://i.pravatar.cc/150?img=13",
-//   },
-//   {
-//     id: "4",
-//     name: "Olivia Moore",
-//     avatar: "https://i.pravatar.cc/150?img=14",
-//   },
-//   {
-//     id: "5",
-//     name: "James Anderson",
-//     avatar: "https://i.pravatar.cc/150?img=15",
-//   },
-//   {
-//     id: "6",
-//     name: "Ava Thomas",
-//     avatar: "https://i.pravatar.cc/150?img=16",
-//   },
-//   {
-//     id: "7",
-//     name: "Ethan Miller",
-//     avatar: "https://i.pravatar.cc/150?img=17",
-//   },
-//   {
-//     id: "8",
-//     name: "Sophia Teylor",
-//     avatar: "https://i.pravatar.cc/150?img=18",
-//   },
-//   {
-//     id: "9",
-//     name: "Benjamin Harris",
-//     avatar: "https://i.pravatar.cc/150?img=19",
-//   },
-//   {
-//     id: "10",
-//     name: "Mia Clark",
-//     avatar: "https://i.pravatar.cc/150?img=20",
-//   },
-// ];
+import { uploadFileToCloudinary } from "@/services/imageService";
 
 interface IConatcts {
   id: string;
@@ -87,7 +35,6 @@ const NewConversationModal = () => {
     string[]
   >([]);
   const [contacts, setContacts] = React.useState<IConatcts[]>([]);
-  console.log("🚀 ~ NewConversationModal ~ contacts:", contacts);
   const [isLoading, setIsLoading] = React.useState<boolean>();
 
   const { isGroup } = useLocalSearchParams();
@@ -114,7 +61,7 @@ const NewConversationModal = () => {
   };
 
   const processNewConversation = (res: any) => {
-    console.log("🚀 ~ processNewConversation ~ res:", res);
+    setIsLoading(false);
     if (res.success) {
       router.back();
       router.push({
@@ -176,9 +123,35 @@ const NewConversationModal = () => {
     }
   };
 
-  const createGroup = () => {
+  const createGroup = async () => {
     if (!groupName?.trim() || !currentUser || selectedParticipants.length < 2)
       return;
+
+    setIsLoading(true);
+
+    try {
+      let avatar = null;
+
+      if (groupAvatar) {
+        const uploadResult = await uploadFileToCloudinary(
+          groupAvatar,
+          "group-avatar"
+        );
+        if (uploadResult.success) avatar = uploadResult.data;
+      }
+
+      newConversation({
+        type: "group",
+        participants: [currentUser.id, ...selectedParticipants],
+        name: groupName,
+        avatar,
+      });
+    } catch (error: any) {
+      console.log("Error creating group", error.message);
+      Alert.alert("Error", error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -193,7 +166,6 @@ const NewConversationModal = () => {
           leftIcon={<BackButton color="black" iconSize={20} />}
           style={{
             alignItems: "flex-start",
-            // marginBottom: 20,
             flex: 0,
             marginBottom: 20,
           }}
