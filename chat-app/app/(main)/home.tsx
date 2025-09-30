@@ -13,6 +13,7 @@ import { useAuth } from "@/contexts/authContext";
 import {
   getConversations,
   newConversation,
+  newMessage,
   testSocket,
 } from "@/socket/socketEvents";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -52,14 +53,29 @@ const Home = () => {
   React.useEffect(() => {
     getConversations(processConversations);
     newConversation(newConversationHandler);
+    newMessage(newMessageHandler);
 
     getConversations(null);
 
     return () => {
       getConversations(processConversations, true);
       newConversation(newConversationHandler, true);
+      newMessage(newMessageHandler, true);
     };
   }, []);
+
+  const newMessageHandler = (res: ResponseProps) => {
+    if (res.success) {
+      const conversationsId = res.data.conversationsId;
+      setConversations((prev) => {
+        let updatedConversations = prev.map((item) => {
+          if (item._id === conversationsId) item.lastMessage = res.data;
+          return item;
+        });
+        return updatedConversations;
+      });
+    }
+  };
 
   const newConversationHandler = (res: ResponseProps) => {
     if (res.success && res.data?.isNew) {

@@ -151,14 +151,14 @@ const Conversation = () => {
         ...(Platform.OS === "web" && { padding: 0 }),
         padding: 0,
         margin: 0,
-        // height: "100%",
       }}
       showPattern={true}
       bgOpacity={0.5}
     >
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={{ flex: 1, paddingTop: 0 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
       >
         <Header
           style={styles.header}
@@ -179,7 +179,7 @@ const Conversation = () => {
             <TouchableOpacity
               style={{
                 position: "relative",
-                bottom: 6,
+                ...(Platform.OS === "web" ? { bottom: 6 } : { bottom: 0 }),
               }}
             >
               <Entypo name="dots-three-vertical" size={18} color="white" />
