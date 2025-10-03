@@ -184,7 +184,8 @@ const NewConversationModal = () => {
                 placeholder="Group Name"
                 value={groupName}
                 onChangeText={setGroupName}
-                style={{ textAlign: "left", outline: "none" }}
+                // style={{ textAlign: "left", outline: "none" }}
+                style={{ textAlign: "left", borderWidth: 0 }}
               />
             </View>
           </View>

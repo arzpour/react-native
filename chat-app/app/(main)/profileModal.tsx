@@ -37,7 +37,6 @@ const ProfileModal = () => {
   });
 
   const processUpdateProfile = (res: any) => {
-
     setLoading(false);
 
     if (res.success) {
@@ -168,7 +167,15 @@ const ProfileModal = () => {
                   backgroundColor: colors.neutral300,
                   paddingLeft: spacingX._10,
                 }}
-                inputStyle={{ textAlign: "left", outline: "none" }}
+                // inputStyle={{
+                //   textAlign: "left",
+                //   outline: "none",
+                //   borderWidth: 0,
+                // }}
+                inputStyle={{
+                  textAlign: "left",
+                  borderWidth: 0,
+                }}
                 onChangeText={(value: string) =>
                   setUserData({ ...userData, email: value })
                 }
@@ -184,7 +191,8 @@ const ProfileModal = () => {
                   backgroundColor: colors.neutral300,
                   paddingLeft: spacingX._10,
                 }}
-                inputStyle={{ textAlign: "left", outline: "none" }}
+                // inputStyle={{ textAlign: "left", outline: "none" }}
+                inputStyle={{ textAlign: "left", borderWidth: 0 }}
                 onChangeText={(value: string) =>
                   setUserData({ ...userData, name: value })
                 }

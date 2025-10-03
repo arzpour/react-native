@@ -99,7 +99,7 @@ const Register = () => {
                       color={colors.neutral600}
                     />
                   }
-                  style={{ outline: "none" }}
+                  // style={{ outline: "none" }}
                 />
                 <Input
                   placeholder="Enter your password"
@@ -114,7 +114,7 @@ const Register = () => {
                       color={colors.neutral600}
                     />
                   }
-                  style={{ outline: "none" }}
+                  // style={{ outline: "none" }}
                 />
               </View>
               <View style={{ marginTop: spacingY._15, gap: spacingY._15 }}>

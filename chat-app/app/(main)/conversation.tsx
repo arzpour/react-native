@@ -207,7 +207,8 @@ const Conversation = () => {
                 borderWidth: 0,
                 paddingHorizontal: 6,
               }}
-              inputStyle={{ textAlign: "left", outline: "none" }}
+              // inputStyle={{ textAlign: "left", outline: "none" , borderWidth: 0,}}
+              inputStyle={{ textAlign: "left", borderWidth: 0 }}
               value={message}
               onChangeText={setMessage}
               icon={
